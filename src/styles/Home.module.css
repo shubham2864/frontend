@@ -1,0 +1,14 @@
+/* src/styles/Home.module.css */
+.homeContainer {
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .homeContainer h1 {
+    font-size: 2rem;
+  }
+  
+  .homeContainer p {
+    font-size: 1.2rem;
+  }
+  
