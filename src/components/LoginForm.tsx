@@ -1,21 +1,24 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { login } from "../services/api";
+import { login as apiLogin } from "../services/api";
 import styles from "../styles/LoginForm.module.css";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const { login } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await login({ email, password });
+      const response = await apiLogin({ email, password });
       if (response.data.access_token) {
         localStorage.setItem("email", email);
         localStorage.setItem("token", response.data.access_token);
+        login(email);
         setIsOtpSent(true);
       }
     } catch (error) {

@@ -1,38 +1,45 @@
-// src/components/Navbar.tsx
 import Link from "next/link";
 import styles from "../styles/Navbar.module.css";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/router";
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
-  }, []);
-
-  const handleLogout = async () => {
-    // await logout();
-    setIsLoggedIn(false);
-    router.push('/login');
+  const handleProfileClick = () => {
+    router.push("/profile");
   };
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.logo}>
-        <a href="/">
+        {isAuthenticated && user ? (
           <img src="/icon.jpg" alt="Website Logo" style={{ width: 50 }} />
-        </a>
+        ) : (
+          <Link href="/">
+              <img src="/icon.jpg" alt="Website Logo" style={{ width: 50 }} />
+          </Link>
+        )}
       </div>
       <ul className={styles.navLinks}>
-        <li>
-          <Link href="/login">Login</Link>
-        </li>
-        <li>
-          <Link href="/register">Register</Link>
-        </li>
+        {isAuthenticated && user ? (
+          <>
+            <Link href="/profile" className={styles.navLink} onClick={handleProfileClick}>Profile
+            </Link>
+            <button onClick={logout} className={styles.logoutButton}>
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/login" className={styles.navLink}> 
+              Login
+            </Link>
+            <Link href="/register" className={styles.navLink}>Sign Up
+            </Link>
+          </>
+        )}
       </ul>
     </nav>
   );

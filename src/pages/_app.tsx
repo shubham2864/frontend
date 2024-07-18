@@ -2,14 +2,14 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import Navbar from '../components/Navbar';
-import { url } from 'inspector';
+import { AuthProvider } from '@/context/AuthContext';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
-    <>
+    <AuthProvider>
       <Navbar />
       <Component {...pageProps} />
-    </>
+    </AuthProvider>
   );
 };
 
