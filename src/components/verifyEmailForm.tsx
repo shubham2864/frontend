@@ -10,7 +10,6 @@ const VerifyEmail: React.FC = () => {
     const verifyUserEmail = async () => {
       try {
         if (token) {
-            console.log("1")
           await verifyEmail(token as string);
           router.push('/verified');
         }

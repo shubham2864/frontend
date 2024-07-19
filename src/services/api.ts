@@ -19,9 +19,7 @@ export const signUp = async (userData: {
   password: string;
   confirmPassword: string;
 }) => {
- const h = await api.post("/user/signup", userData);
- console.log("signup done23" + h)
- return h
+ return await api.post("/user/signup", userData);
 };
 
 export const login = async (credentials: {
@@ -34,27 +32,12 @@ export const login = async (credentials: {
 export const verifyEmail = async (token: string) => {
   console.log("VERIFY EMAIL CALLING");
   try {
-    console.log("This is your token :" + token)
-    // localStorage.setItem('token',token);
     await api.get(`/user/verify-email?token=${token}`);
-    console.log("USER VERIFIED SUCCESSFULLY")
   } catch (error) {
     console.error('Verification failed', error);
     throw new Error('Verification failed');
   }
 }
-
-export const getProfile = async () => {
-  return await api.get("/user/profile");
-};
-
-export const updateProfile = async (userData: {
-  fullName: string;
-  username: string;
-  email: string;
-}) => {
-  return await api.put("/user/profile", userData);
-};
 
 export const requestOtp = async () => {
   return await api.post("/auth/request-otp");
@@ -62,4 +45,22 @@ export const requestOtp = async () => {
 
 export const verifyOtp = async (otp: string, email: string) => {
   return await api.post("/auth/verify-otp", { otp , email});
+};
+
+export const getProfile = async (token: any) => {
+  console.log("hello`21233"+ token)
+  return await api.get(`/user/profile`,{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const updateProfile = async (userData: {
+  userName?: string;
+  address?: string;
+  mobileNo?: string;
+  dateOfBirth?: string;
+},token: any) => {
+  return await api.put("/user/profile", userData);
 };
