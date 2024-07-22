@@ -1,14 +1,61 @@
-/* src/styles/Home.module.css */
 .homeContainer {
-    padding: 2rem;
-    text-align: center;
+  position: relative;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url('/background.jpg') no-repeat center center/cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.content {
+  position: relative;
+  color: #000000;
+  text-align: center;
+  z-index: 1;
+}
+
+.welcomeMessage {
+  font-size: 3rem;
+  margin: 0;
+  animation: fadeIn 2s ease-in-out;
+}
+
+.description {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+}
+
+.exploreButton {
+  margin-top: 2rem;
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #ffffff;
+  background-color: #000000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.exploreButton:hover {
+  background-color: #000000;
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .homeContainer h1 {
-    font-size: 2rem;
+  to {
+    opacity: 1;
   }
-  
-  .homeContainer p {
-    font-size: 1.2rem;
-  }
-  
+}

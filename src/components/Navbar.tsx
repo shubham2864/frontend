@@ -1,3 +1,4 @@
+// src/components/Navbar.js
 import Link from "next/link";
 import styles from "../styles/Navbar.module.css";
 import { useAuth } from "@/context/AuthContext";
@@ -11,21 +12,34 @@ const Navbar = () => {
     router.push("/profile");
   };
 
+  // List of routes where navbar should be hidden
+  const hideNavbarRoutes = ["/otp"];
+
+  // Determine if the current route is in the list of routes to hide the navbar
+  const hideNavbar = hideNavbarRoutes.includes(router.pathname);
+
+  if (hideNavbar) {
+    return null;
+  }
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.logo}>
         {isAuthenticated && user ? (
-          <img src="/icon.jpg" alt="Website Logo" style={{ width: 50 }} />
+          <Link href="/dashboard">
+            <img src="/icon.jpg" alt="Website Logo" style={{ width: 50 }} />
+          </Link>
         ) : (
           <Link href="/">
-              <img src="/icon.jpg" alt="Website Logo" style={{ width: 50 }} />
+            <img src="/icon.jpg" alt="Website Logo" style={{ width: 50 }} />
           </Link>
         )}
       </div>
       <ul className={styles.navLinks}>
         {isAuthenticated && user ? (
           <>
-            <Link href="/profile" className={styles.navLink} onClick={handleProfileClick}>Profile
+            <Link href="/profile" className={styles.navLink} onClick={handleProfileClick}>
+              Profile
             </Link>
             <button onClick={logout} className={styles.logoutButton}>
               Logout
@@ -33,10 +47,11 @@ const Navbar = () => {
           </>
         ) : (
           <>
-            <Link href="/login" className={styles.navLink}> 
+            <Link href="/login" className={styles.navLink}>
               Login
             </Link>
-            <Link href="/register" className={styles.navLink}>Sign Up
+            <Link href="/register" className={styles.navLink}>
+              Sign Up
             </Link>
           </>
         )}

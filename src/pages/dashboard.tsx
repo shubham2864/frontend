@@ -1,4 +1,3 @@
-// src/pages/dashboard.tsx
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthContext";
@@ -22,7 +21,6 @@ const Dashboard: React.FC = () => {
     <div className={styles.container}>
       <h1 className={styles.header}>Welcome to Your Dashboard</h1>
       {user && <p className={styles.userInfo}>Logged in as: {user.email}</p>}
-
     </div>
   );
 };

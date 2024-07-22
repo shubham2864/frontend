@@ -1,4 +1,3 @@
-// src/components/Home.tsx
 import { useEffect, useState } from 'react';
 import styles from '../styles/Home.module.css';
 
@@ -13,11 +12,16 @@ const Home = () => {
     }
   }, []);
 
-
   return (
     <div className={styles.homeContainer}>
-      <h1>Welcome {userName ? `, ${userName}` : ''}</h1>
-      <p>This is the home page.</p>
+      <div className={styles.overlay}></div>
+      <div className={styles.content}>
+        <h1 className={styles.welcomeMessage}>
+          Welcome{userName ? `, ${userName}` : ''}
+        </h1>
+        <p className={styles.description}>This is the home page.</p>
+        <button className={styles.exploreButton}>Explore</button>
+      </div>
     </div>
   );
 };

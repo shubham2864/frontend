@@ -1,13 +1,28 @@
 .navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: #000000;
+  background-color: black;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  box-sizing: border-box;
 }
 
 .logo img {
-  width: 50px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.logo img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .navLinks {
@@ -15,26 +30,46 @@
   list-style-type: none;
   margin: 0;
   padding: 0;
+  overflow-x: auto;
 }
 
 .navLinks li {
-  margin-left: 10px;
+  margin-left: 20px;
 }
 
 .navLink {
   color: #fdfdfd;
   text-decoration: none;
-  padding: 10px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navLink:hover {
+  background-color: #333;
+  color: #fdfdfd;
 }
 
 .logoutButton {
-  background-color: transparent;
+  background-color: #3498db;
   border: none;
   cursor: pointer;
   color: #ffffff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.logoutButton:hover {
+  background-color: #ff6666;
 }
 
 .navLink:hover,
 .logoutButton:hover {
-  text-decoration: underline;
+  text-decoration: none;
+}
+
+.navLink:active,
+.logoutButton:active {
+  transform: translateY(2px);
 }

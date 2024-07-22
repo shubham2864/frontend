@@ -1,43 +1,80 @@
-/* src/styles/Dashboard.module.css */
+/* Ensure the container doesn't overlap with the navbar */
 .container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 80px; /* Adjust this value based on the height of your navbar */
+  background-color: #f5f5f5; /* Light background color */
+  min-height: 100vh; /* Ensure full height */
+  animation: fadeIn 1s ease-in-out;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2.5rem;
+  color: #3498db; /* Bright blue color */
+  animation: fadeInUp 1s ease-out;
+}
+
+.userInfo {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.card {
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
+  background: #ffffff; /* White background */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cardTitle {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.cardContent {
+  color: #555;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .header {
-    text-align: center;
-    margin-bottom: 20px;
+  to {
+    opacity: 1;
   }
-  
-  .userInfo {
-    text-align: center;
-    margin-bottom: 20px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  .content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .card {
-    flex: 1;
-    min-width: 300px;
-    max-width: 400px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .cardTitle {
-    margin-bottom: 10px;
-  }
-  
-  .cardContent {
-    color: #555;
-  }
-  
+}

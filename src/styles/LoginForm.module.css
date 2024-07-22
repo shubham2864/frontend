@@ -1,39 +1,96 @@
-/* src/styles/LoginForm.module.css */
+/* Background color matching the home page but brighter */
+.loginPageBackground {
+  background-color: #f7f7f7; /* Light background color */
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Styling for the auth container */
 .authContainer {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 2rem;
-    border: 1px solid black;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  border: 1px solid #ddd; /* Light border color */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff; /* White background for form */
+  color: #333;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Styling for the header */
+.authContainer h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  color: #3498db; /* Bright blue for header */
+}
+
+/* Styling for input fields */
+.inputField {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 8px;
+  background-color: #fafafa; /* Light background */
+  color: #333;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.inputField:focus {
+  border-color: #3498db; /* Blue border on focus */
+  background-color: #ffffff; /* White background on focus */
+  outline: none;
+}
+
+/* Styling for the submit button */
+.submitButton {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #3498db; /* Bright blue button */
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: #2980b9; /* Darker blue on hover */
+  transform: scale(1.05);
+}
+
+.submitButton:active {
+  transform: scale(0.95);
+}
+
+/* Styling for links */
+.linkContainer {
+  text-align: right;
+  margin: 10px 0;
+}
+
+.link {
+  color: #3498db; /* Blue link color */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: #2980b9; /* Darker blue on hover */
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .authContainer h2 {
-    text-align: center;
-    margin-bottom: 1rem;
+  to {
+    opacity: 1;
   }
-  
-  .inputField {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #000000;
-    border-radius: 4px;
-  }
-  
-  .submitButton {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid;
-    border-radius: 4px;
-    background-color: #333;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  
-  .submitButton:hover {
-    background-color: #555;
-  }
-  
+}

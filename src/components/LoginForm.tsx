@@ -33,32 +33,39 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className={styles.authContainer}>
-      <h2 className={styles.header}>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={styles.inputField}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={styles.inputField}
-        />
-        <button type="submit" className={styles.submitButton}>
-          Login
-        </button>
-        <div style={{ textAlign: "right", margin: 10 }}>
-          <a href="register" style={{ color: "black" }}>
-            SignUp
-          </a>
-        </div>
-      </form>
+    <div className={styles.loginPageBackground}>
+      <div className={styles.authContainer}>
+        <h2 className={styles.header}>Login</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={styles.inputField}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={styles.inputField}
+          />
+          <button type="submit" className={styles.submitButton}>
+            Login
+          </button>
+          <div className={styles.linkContainer}>
+            <a href="forgot-password" className={styles.link}>
+              Forgot Password
+            </a>
+          </div>
+          <div className={styles.linkContainer}>
+            <a href="register" className={styles.link}>
+              Sign Up
+            </a>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

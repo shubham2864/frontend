@@ -28,7 +28,7 @@ const Profile = () => {
   };
 
   const handleConfirm = () => {
-    router.push("/dashboard"); // Adjust the path if necessary
+    router.push("/dashboard");
   };
 
   return (

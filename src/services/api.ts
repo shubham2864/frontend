@@ -64,3 +64,12 @@ export const updateProfile = async (userData: {
 },token: any) => {
   return await api.put("/user/profile", userData);
 };
+
+
+export const forgotPassword = async (email: string) => {
+  return await api.post("/auth/forgot-password", { email });
+};
+
+export const resetPassword = async (token: string, newPassword: string) => {
+  return await api.post("/auth/reset-password", { token, newPassword });
+};

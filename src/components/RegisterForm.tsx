@@ -33,58 +33,60 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
-    <div className={styles.authContainer}>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="User Name"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          className={styles.inputField}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={styles.inputField}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={styles.inputField}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className={styles.inputField}
-          required
-        />
-        <div className={styles.inputGroup}>
-          <label>
-            <input
-              type="checkbox"
-              checked={acceptTerms}
-              onChange={(e) => setAcceptTerms(e.target.checked)}
-            />
-            I accept the terms and conditions
-          </label>
-        </div>
-        <button type="submit" className={styles.submitButton}>
-          Register
-        </button>
-        <div style={{ textAlign: 'right', margin: 10 }}>
-          <a href='login' style={{ color: "black" }}>SignIN</a>
-        </div>
-      </form>
+    <div className={styles.registerPageBackground}>
+      <div className={styles.authContainer}>
+        <h2>Register</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="User Name"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            className={styles.inputField}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={styles.inputField}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={styles.inputField}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className={styles.inputField}
+            required
+          />
+          <div className={styles.inputGroup}>
+            <label>
+              <input
+                type="checkbox"
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+              />
+              I accept the terms and conditions
+            </label>
+          </div>
+          <button type="submit" className={styles.submitButton}>
+            Register
+          </button>
+          <div className={styles.linkContainer}>
+            <a href='login' className={styles.link}>Sign In</a>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
