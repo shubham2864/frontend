@@ -4,14 +4,17 @@ import { useAuth } from "../context/AuthContext";
 import styles from "../styles/Dashboard.module.css";
 
 const Dashboard: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, authChecked } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login");
+    if (authChecked) { // Wait for the auth check to complete
+      const token = localStorage.getItem('token');
+      if (!token || !isAuthenticated) {
+        router.push("/login");
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [authChecked, isAuthenticated, router]);
 
   const navigateToProfile = () => {
     router.push("/profile");

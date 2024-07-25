@@ -14,12 +14,23 @@ api.interceptors.request.use((config) => {
 });
 
 export const signUp = async (userData: {
-  userName: string;
+  companyName: string;
+  mobileNumber: string;
+  website?: string;
+  streetAddress: string;
+  streetAddress2?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
+  phoneNumber: string;
 }) => {
- return await api.post("/user/signup", userData);
+  console.log("signup is")
+  return await api.post("/user/signup", userData);
 };
 
 export const login = async (credentials: {
@@ -34,37 +45,50 @@ export const verifyEmail = async (token: string) => {
   try {
     await api.get(`/user/verify-email?token=${token}`);
   } catch (error) {
-    console.error('Verification failed', error);
-    throw new Error('Verification failed');
+    console.error("Verification failed", error);
+    throw new Error("Verification failed");
   }
-}
+};
 
 export const requestOtp = async () => {
   return await api.post("/auth/request-otp");
 };
 
 export const verifyOtp = async (otp: string, email: string) => {
-  return await api.post("/auth/verify-otp", { otp , email});
+  return await api.post("/auth/verify-otp", { otp, email });
 };
 
 export const getProfile = async (token: any) => {
-  console.log("hello`21233"+ token)
-  return await api.get(`/user/profile`,{
+  console.log("hello3" + token);
+  return await api.get(`/user/profile`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 };
 
-export const updateProfile = async (userData: {
-  userName?: string;
-  address?: string;
-  mobileNo?: string;
-  dateOfBirth?: string;
-},token: any) => {
+export const updateProfile = async (
+  userData: {
+  companyName: string;
+  mobileNumber: string;
+  website?: string;
+  streetAddress: string;
+  streetAddress2?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  phoneNumber: string;
+  },
+  token: any
+) => {
+  console.log(userData);
   return await api.put("/user/profile", userData);
 };
-
 
 export const forgotPassword = async (email: string) => {
   return await api.post("/auth/forgot-password", { email });
@@ -72,4 +96,12 @@ export const forgotPassword = async (email: string) => {
 
 export const resetPassword = async (token: string, newPassword: string) => {
   return await api.post("/auth/reset-password", { token, newPassword });
+};
+
+export const getUsers = async () => {
+  return await api.get("/admin/users");
+};
+
+export const deleteUser = async (userId: string) => {
+  return await api.delete(`/admin/users/${userId}`);
 };

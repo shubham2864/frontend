@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/router';
 
@@ -9,6 +8,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  authChecked: boolean; // Add authChecked to the interface
   login: (email: string) => void;
   authenticate: () => void;
   logout: () => void;
@@ -23,6 +23,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authChecked, setAuthChecked] = useState<boolean>(false); // New state to track auth check completion
   const router = useRouter();
 
   useEffect(() => {
@@ -32,12 +33,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser({ email });
       setIsAuthenticated(true);
       const otpVerified = localStorage.getItem('otpVerified');
-      if (otpVerified == 'true') {
-        router.push('/dashboard'); // Redirect to dashboard if OTP is verified
+      if (otpVerified === 'true') {
+        router.push('/dashboard');
       } else {
-        router.push('/dashboard'); // Redirect to OTP page if OTP not verified
+        router.push('/otp-verification'); // Ensure user completes OTP verification
       }
     }
+    setAuthChecked(true); // Mark auth check as completed
   }, []);
 
   const login = (email: string) => {
@@ -59,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, authenticate, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, authChecked, login, authenticate, logout }}>
       {children}
     </AuthContext.Provider>
   );

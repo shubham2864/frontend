@@ -5,11 +5,18 @@ import styles from "../styles/ProfileForm.module.css";
 
 const EditProfile = () => {
   const [formData, setFormData] = useState({
-    userName: "",
+    companyName: "",
+    mobileNumber: "",
+    website: "",
+    streetAddress: "",
+    streetAddress2: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    firstName: "",
+    lastName: "",
     email: "",
-    address: "",
-    mobileNo: "",
-    dateOfBirth: "",
+    phoneNumber: ""
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,14 +27,13 @@ const EditProfile = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
-        
+        console.log("1");
         const response = await getProfile(token as string);
-        
+        console.log("2" + response.data);
         const formattedData = {
-          ...response.data,
-          dateOfBirth: response.data.dateOfBirth.split('T')[0], // Extracting only the date part
+          ...response.data
         };
-        
+        console.log("yeah profile fetched");
         setFormData(formattedData);
       } catch (error) {
         setError("Failed to fetch profile data");
@@ -51,8 +57,7 @@ const EditProfile = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
-
-      await updateProfile(formData, token as string);
+      await updateProfile(formData as any, token as string);
       router.push("/profile");
     } catch (error) {
       setError("Failed to update profile");
@@ -73,52 +78,123 @@ const EditProfile = () => {
       <div className={styles.formContainer}>
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <label>Username:</label>
+            <label>Company Name:</label>
             <input
               type="text"
-              name="userName"
-              value={formData.userName}
-              onChange={handleChange}
-              className={styles.inputField}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label>Email:</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
+              name="companyName"
+              value={formData.companyName}
               onChange={handleChange}
               className={styles.inputField}
               readOnly
             />
           </div>
           <div className={styles.formGroup}>
-            <label>Address:</label>
+            <label>mobileNumber:</label>
             <input
               type="text"
-              name="address"
-              value={formData.address}
+              name="mobileNumber"
+              value={formData.mobileNumber}
               onChange={handleChange}
               className={styles.inputField}
             />
           </div>
           <div className={styles.formGroup}>
-            <label>Mobile No:</label>
+            <label>Website:</label>
+            <input
+              type="email"
+              name="website"
+              value={formData.website}
+              onChange={handleChange}
+              className={styles.inputField}
+              readOnly
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Street Address:</label>
             <input
               type="text"
-              name="mobileNo"
-              value={formData.mobileNo}
+              name="streetAddress"
+              value={formData.streetAddress}
               onChange={handleChange}
               className={styles.inputField}
             />
           </div>
           <div className={styles.formGroup}>
-            <label>Date of Birth:</label>
+            <label>Street Address 2</label>
             <input
-              type="date"
-              name="dateOfBirth"
-              value={formData.dateOfBirth}
+              type="text"
+              name="streetAddress2"
+              value={formData.streetAddress2}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>City</label>
+            <input
+              type="text"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>State</label>
+            <input
+              type="text"
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Zip Code</label>
+            <input
+              type="text"
+              name="zipCode"
+              value={formData.zipCode}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>First Name</label>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Last Name</label>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Email</label>
+            <input
+              type="text"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Phone Number</label>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={formData.phoneNumber}
               onChange={handleChange}
               className={styles.inputField}
             />
