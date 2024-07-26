@@ -1,0 +1,168 @@
+.settingsContainer {
+    padding: 20px 40px;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .backButton {
+    color: #333;
+    text-decoration: none;
+    font-size: 24px;
+    margin-right: 20px;
+    transition: color 0.3s ease;
+  }
+  
+  .backButton:hover {
+    color: #000;
+  }
+  
+  .h1 {
+    font-size: 24px;
+    margin: 0;
+  }
+  
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative;
+  }
+  
+  .tab:hover {
+    background-color: #f4f4f4;
+  }
+  
+  .activeTab {
+    border-bottom: 3px solid #0070f3;
+    background-color: #e0f7ff;
+  }
+  
+  .icon {
+    margin-right: 10px;
+  }
+  
+  .content {
+    margin-top: 20px;
+    padding: 0 10px;
+  }
+  
+  .userManagement {
+    animation: fadeIn 0.5s ease;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .searchAdd {
+    display: flex;
+    align-items: center;
+  }
+  
+  .searchBar {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+    margin-right: 10px;
+  }
+  
+  .addButton {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .addButton:hover {
+    background-color: #218838;
+  }
+  
+  .userTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    background: white;
+  }
+  
+  .userTable th,
+  .userTable td {
+    padding: 15px;
+    text-align: left;
+  }
+  
+  .userTable th {
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  
+  .userTable tr:nth-child(even) {
+    background-color: #f4f4f4;
+  }
+  
+  .userTable tr:hover {
+    background-color: #e0e0e0;
+    transition: background-color 0.3s ease;
+  }
+  
+  .userTable th:first-child,
+  .userTable td:first-child {
+    border-top-left-radius: 10px;
+  }
+  
+  .userTable th:last-child,
+  .userTable td:last-child {
+    border-top-right-radius: 10px;
+  }
+  
+  .userTable th:last-child,
+  .userTable td:last-child {
+    border-bottom-right-radius: 10px;
+  }
+  
+  .userTable th:first-child,
+  .userTable td:first-child {
+    border-bottom-left-radius: 10px;
+  }
+  
+  .editButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #0070f3;
+    transition: color 0.3s ease;
+  }
+  
+  .editButton:hover {
+    color: #0056b3;
+  }
+  

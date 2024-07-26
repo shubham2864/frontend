@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (otpVerified === 'true') {
         router.push('/dashboard');
       } else {
-        router.push('/otp-verification'); // Ensure user completes OTP verification
+        router.push('/otp'); // Ensure user completes OTP verification
       }
     }
     setAuthChecked(true); // Mark auth check as completed

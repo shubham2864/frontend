@@ -10,116 +10,152 @@ import {
   faPlusCircle,
   faBars,
   faSignOutAlt,
-  faTimes,
-  faBackward,
-  faArrowCircleLeft,
+  faArrowAltCircleLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import Modal from "./Modal";
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const hideNavbarRoutes = ["/otp", "/login", "/register"];
   const hideNavbar = hideNavbarRoutes.includes(router.pathname);
+
+  const handleCreateClick = () => {
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const handleModalSelect = (option: string) => {
+    setModalOpen(false);
+    if (option === "agreement") {
+      router.push("/agreement");
+    } else if (option === "subscription") {
+      router.push("/subscription");
+    } else if (option === "invoice") {
+      router.push("/invoice");
+    }
+  };
 
   if (hideNavbar) {
     return null;
   }
 
   return (
-    <nav className={styles.navbar}>
-      {isAuthenticated && user ? (
-        <>
-          <div
-            className={`${styles.sidebar} ${sidebarOpen ? styles.open : ""}`}
-          >
-            <div className={styles.sidebarContent}>
-              <button
-                className={styles.closeBtn}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <FontAwesomeIcon icon={faArrowCircleLeft} style={{color: "black"}} />
-              </button>
-              <Link href="/dashboard" onClick={() => setSidebarOpen(false)}>
-                <div className={styles.sidebarLink}>
+    <>
+      <nav className={styles.navbar}>
+        {isAuthenticated && user ? (
+          <>
+            <div
+              className={`${styles.sidebar} ${sidebarOpen ? styles.open : ""}`}
+            >
+              <div className={styles.sidebarContent}>
+                <button
+                  className={styles.closeBtn}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowAltCircleLeft}
+                    style={{ color: "white" }}
+                  />
+                </button>
+                <Link
+                  href="/dashboard"
+                  className={styles.sidebarLink}
+                  onClick={() => setSidebarOpen(false)}
+                >
                   <FontAwesomeIcon icon={faTachometerAlt} />
-                  Dashboard
-                </div>
-              </Link>
-              <Link href="/dashboard" onClick={() => setSidebarOpen(false)}>
-                <div className={styles.sidebarLink}>
+                  &nbsp;Dashboard
+                </Link>
+                <Link
+                  href="/accounting"
+                  className={styles.sidebarLink}
+                  onClick={() => setSidebarOpen(false)}
+                >
                   <FontAwesomeIcon icon={faFileInvoiceDollar} />
-                  Accounting
-                </div>
-              </Link>
-              <Link href="/dashboard" onClick={() => setSidebarOpen(false)}>
-                <div className={styles.sidebarLink}>
+                  &nbsp;Accounting
+                </Link>
+                <div onClick={handleCreateClick} className={styles.sidebarLink}>
                   <FontAwesomeIcon icon={faPlusCircle} />
-                  Create
+                  &nbsp;Create
                 </div>
-              </Link>
-              <button onClick={logout} className={styles.logoutButton}>
-                <FontAwesomeIcon icon={faSignOutAlt} />
-                Logout
-              </button>
-            </div>
-          </div>
-          <div
-            className={styles.sidebarToggle}
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <FontAwesomeIcon icon={faBars} />
-          </div>
-          <div
-            className={styles.brand}
-            onClick={() => router.push("/dashboard")}
-          >
-            <p style={{ color: "white", cursor: "pointer" }}>ABC Insurance</p>
-          </div>
-          <div
-            className={styles.profileIcon}
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-          >
-            <img
-              src="/userIcon.png"
-              alt="User Profile"
-              className={styles.profileImage}
-            />
-            {dropdownOpen && (
-              <div className={styles.dropdownMenu}>
-                <Link href="/profile" className={styles.dropdownLink}>
-                  Profile
-                </Link>
-                <Link href="/dashboard" className={styles.dropdownLink}>
-                  Dashboard
-                </Link>
-                <button onClick={logout} className={styles.dropdownLink}>
-                  Logout
+                <button onClick={logout} className={styles.logoutButton}>
+                  <FontAwesomeIcon icon={faSignOutAlt} />
+                  &nbsp;Logout
                 </button>
               </div>
-            )}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className={styles.logo}>
-            <Link href="/">
-              <img src="/icon.jpg" alt="Website Logo" />
-            </Link>
-          </div>
-          <ul className={styles.navLinks}>
-            <Link href="/login" className={styles.navLink}>
-              Login
-            </Link>
-            <Link href="/register" className={styles.navLink}>
-              Sign Up
-            </Link>
-          </ul>
-        </>
-      )}
-    </nav>
+            </div>
+            <div
+              className={styles.sidebarToggle}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <FontAwesomeIcon icon={faBars} />
+            </div>
+            <div
+              className={styles.brand}
+              onClick={() => router.push("/dashboard")}
+            >
+              <p style={{ color: "white", cursor: "pointer" }}>ABC Insurance</p>
+            </div>
+            <div className={styles.profileIcons}>
+              <div className={styles.settingsIcon}>
+                <img
+                  src="/settings.png"
+                  alt="Settings"
+                  className={styles.settingsImage}
+                  onClick={() => router.push("/settings")}
+                />
+              </div>
+              <div
+                className={styles.profileIcon}
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                <img
+                  src="/userIcon.png"
+                  alt="User Profile"
+                  className={styles.profileImage}
+                />
+                {dropdownOpen && (
+                  <div className={styles.dropdownMenu}>
+                    <Link href="/profile" className={styles.dropdownLink}>
+                      Profile
+                    </Link>
+                    <Link href="/dashboard" className={styles.dropdownLink}>
+                      Dashboard
+                    </Link>
+                    <button onClick={logout} className={styles.dropdownLink}>
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <ul className={styles.navLinks}>
+              <Link href="/login" className={styles.navLink}>
+                Login
+              </Link>
+              <Link href="/register" className={styles.navLink}>
+                Register
+              </Link>
+            </ul>
+          </>
+        )}
+      </nav>
+      <Modal
+        isOpen={modalOpen}
+        onClose={handleModalClose}
+        onSelect={handleModalSelect}
+      />
+    </>
   );
 };
 

@@ -13,6 +13,23 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // If the token has expired, log the user out
+      localStorage.removeItem("token");
+      localStorage.removeItem("email");
+      localStorage.removeItem("otpVerified");
+      // Redirect to login
+      if (typeof window !== 'undefined') {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const signUp = async (userData: {
   companyName: string;
   mobileNumber: string;
@@ -98,7 +115,7 @@ export const resetPassword = async (token: string, newPassword: string) => {
   return await api.post("/auth/reset-password", { token, newPassword });
 };
 
-export const getUsers = async () => {
+export const getUsers = async (token: any) => {
   return await api.get("/admin/users");
 };
 
