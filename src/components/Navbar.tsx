@@ -35,12 +35,13 @@ const Navbar: React.FC = () => {
   const handleModalSelect = (option: string) => {
     setModalOpen(false);
     if (option === "agreement") {
-      router.push("/agreement");
+      router.push("/create");
     } else if (option === "subscription") {
       router.push("/subscription");
     } else if (option === "invoice") {
       router.push("/invoice");
     }
+    setSidebarOpen(false)
   };
 
   if (hideNavbar) {

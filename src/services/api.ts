@@ -122,3 +122,16 @@ export const getUsers = async (token: any) => {
 export const deleteUser = async (userId: string) => {
   return await api.delete(`/admin/users/${userId}`);
 };
+
+export const fetchCustomerSuggestions = async (email: string) => {
+  console.log(email);
+  const response = await api.get(`/user?email=${email}`);
+  return response.data;
+};
+
+export const fetchCustomerDetails = async (email: string) => {
+  console.log(email);
+  const response = await api.get(`/user/${email}`);
+  console.log(response+"hello")
+  return response.data;
+};
