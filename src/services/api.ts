@@ -22,7 +22,7 @@ api.interceptors.response.use(
       localStorage.removeItem("email");
       localStorage.removeItem("otpVerified");
       // Redirect to login
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
     }
@@ -46,8 +46,19 @@ export const signUp = async (userData: {
   confirmPassword: string;
   phoneNumber: string;
 }) => {
-  console.log("signup is")
+  console.log("signup is");
   return await api.post("/user/signup", userData);
+};
+
+export const newUser = async (userData: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  role: string;
+}) => {
+  console.log("newUser Signup is");
+  return await api.post("/user/newUser", userData);
 };
 
 export const login = async (credentials: {
@@ -86,20 +97,20 @@ export const getProfile = async (token: any) => {
 
 export const updateProfile = async (
   userData: {
-  companyName: string;
-  mobileNumber: string;
-  website?: string;
-  streetAddress: string;
-  streetAddress2?: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber: string;
+    companyName: string;
+    mobileNumber: string;
+    website?: string;
+    streetAddress: string;
+    streetAddress2?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    phoneNumber: string;
   },
   token: any
 ) => {
@@ -115,8 +126,20 @@ export const resetPassword = async (token: string, newPassword: string) => {
   return await api.post("/auth/reset-password", { token, newPassword });
 };
 
-export const getUsers = async (token: any) => {
-  return await api.get("/admin/users");
+export const getUsers = async (token: string) => {
+  console.log("getUsers function called");
+  try {
+    const response = await api.get("/admin/users", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response.data)
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:");
+    throw error;
+  }
 };
 
 export const deleteUser = async (userId: string) => {
@@ -132,6 +155,6 @@ export const fetchCustomerSuggestions = async (email: string) => {
 export const fetchCustomerDetails = async (email: string) => {
   console.log(email);
   const response = await api.get(`/user/${email}`);
-  console.log(response+"hello")
+  console.log(response + "hello");
   return response.data;
 };

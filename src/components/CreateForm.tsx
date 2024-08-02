@@ -16,11 +16,15 @@ import {
   Step,
   StepLabel,
   Box,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import styles from "../styles/CreatePage.module.css"; // Import the CSS module
 import Link from "next/link";
 import { fetchCustomerDetails } from "../services/api"; // Adjust import path as necessary
+import { useRouter } from "next/router";
 
 interface Quote {
   quoteNumber: string;
@@ -54,7 +58,8 @@ const CreatePage = () => {
     Zip: "",
     file: null,
   });
-
+  const router = useRouter()
+  const [selectedValue, setSelectedValue] = useState<string>('');
   const [Add2, setAdd2] = useState([
     {
       Buisness: "",
@@ -73,12 +78,24 @@ const CreatePage = () => {
   const steps = ["Select or create a customer", "Upload Quote", "Review Quote"];
   const showBusinessForm = customerType === "commercial";
   // const [quotes, setQuotes] = useState<Quote[]>([{ text: "", file: null }]);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAdd1({
       ...Add1,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleBusinessInputChange = (index: number, e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+    const newBusinessDetails = Add2.map((business, i) => (
+      i === index ? { ...business, [e.target.name as string]: e.target.value as string } : business
+    ));
+    setAdd2(newBusinessDetails);
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedValue(event.target.value);
   };
 
   const addNewBusiness = () => {
@@ -166,6 +183,17 @@ const CreatePage = () => {
     });
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setUploadedFiles([...uploadedFiles, ...Array.from(event.target.files)]);
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    const newFiles = uploadedFiles.filter((_, i) => i !== index);
+    setUploadedFiles(newFiles);
+  };
+
   const addNewQuote = () => {
     setQuotes([
       ...quotes,
@@ -191,6 +219,22 @@ const CreatePage = () => {
     ]);
   };
 
+  const isStepComplete = (step: number) => {
+    if (step === 0) {
+      return (
+        Add1.email &&
+        Add1.firstname &&
+        Add1.lastname &&
+        Add1.contact &&
+        Add1.Address &&
+        Add1.city &&
+        Add1.state &&
+        Add1.Zip
+      );
+    }
+    return true;
+  };
+  
   const removeQuote = (index: any) => {
     if (quotes.length > 1) {
       setQuotes((prevQuotes) => prevQuotes.filter((_, i) => i !== index));
@@ -232,6 +276,11 @@ const CreatePage = () => {
     setQuotes([emptyQuoteTemplate]);
     setIsAutocompleteComplete(false);
     setEmailError(""); // Clear error message on reset
+  };
+
+  const handleFinish = () => {
+    alert("Agreement created successfully!");
+    router.push("/dashboard");
   };
 
   return (
@@ -348,16 +397,21 @@ const CreatePage = () => {
                 />
               </Grid>
               <Grid item xs={12} md={4}>
-                <TextField
-                  name="state"
-                  label="State"
-                  value={Add1.state}
-                  onChange={handleInputChange}
-                  placeholder="State"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                />
+              <FormControl fullWidth margin="normal" variant="outlined">
+                  <InputLabel id="state-label">State</InputLabel>
+                  <Select
+                    labelId="state-label"
+                    name="state"
+                    value={Add1.state}
+                    onChange={handleInputChange}
+                    label="State"
+                  >
+                    <MenuItem value="Indore">Indore</MenuItem>
+                    <MenuItem value="Bhopal">Bhopal</MenuItem>
+                    <MenuItem value="Delhi">Delhi</MenuItem>
+                    {/* Add more states as needed */}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} md={4}>
                 <TextField
@@ -527,9 +581,9 @@ const CreatePage = () => {
             </Typography>
             <FormControl component="fieldset" margin="normal">
               <RadioGroup
-                value={customerType}
-                onChange={(e) => setCustomerType(e.target.value)}
                 row
+                value={selectedValue} // Controlled value
+        onChange={handleChange} // Handle change
               >
                 <FormControlLabel
                   value="yes"
@@ -823,25 +877,36 @@ const CreatePage = () => {
           </div>
         )}
         {activeStep === 2 && (
-          <div>
-            {/* Step 3 content */}
-            <Typography variant="h6">Step 3: Review and Submit</Typography>
-            {/* Add your form fields for Step 3 here */}
+          <div className={styles.formSection}>
+            <Typography variant="h6">Review Your Details</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Typography>Email: {Add1.email}</Typography>
+                <Typography>First Name: {Add1.firstname}</Typography>
+                <Typography>Last Name: {Add1.lastname}</Typography>
+                <Typography>Contact: {Add1.contact}</Typography>
+                <Typography>Address: {Add1.Address}</Typography>
+                <Typography>City: {Add1.city}</Typography>
+                <Typography>State: {Add1.state}</Typography>
+                <Typography>Zip: {Add1.Zip}</Typography>
+              </Grid>
+              {/* Add more fields if needed */}
+            </Grid>
+            <Box mt={2}>
+              <Button variant="contained" color="primary" onClick={handleFinish}>
+                Finish
+              </Button>
+            </Box>
           </div>
         )}
-        <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-          <Button
-            color="inherit"
-            disabled={activeStep === 0}
-            onClick={handleBack}
-            sx={{ mr: 1 }}
-          >
+         <Box display="flex" justifyContent="space-between" mt={2}>
+          <Button disabled={activeStep === 0} onClick={handleBack}>
             Back
           </Button>
-          <Box sx={{ flex: "1 1 auto" }} />
           <Button
+            variant="contained"
+            color="primary"
             onClick={handleNext}
-            // Disable if step is not complete
           >
             {activeStep === steps.length - 1 ? "Finish" : "Next"}
           </Button>
