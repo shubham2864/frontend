@@ -166,3 +166,23 @@
     color: #0056b3;
   }
   
+  .formContainer {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .formGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  
+  .formLabel {
+    flex: 0 0 200px; /* Adjust width as needed */
+    font-weight: bold;
+  }
+  
+  .formValue {
+    flex: 1;
+  }
+  

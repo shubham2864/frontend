@@ -50,6 +50,12 @@ export const signUp = async (userData: {
   return await api.post("/user/signup", userData);
 };
 
+export const agreement = async (userData: {
+  
+}) => {
+  
+}
+
 export const newUser = async (userData: {
   firstName: string;
   lastName: string;
@@ -57,9 +63,9 @@ export const newUser = async (userData: {
   phoneNumber: string;
   role: string;
 }) => {
-  console.log("newUser Signup is");
+  console.log("newUser Signup is "+ userData.firstName);
   return await api.post("/user/newUser", userData);
-};
+};  
 
 export const login = async (credentials: {
   email: string;
@@ -158,3 +164,5 @@ export const fetchCustomerDetails = async (email: string) => {
   console.log(response + "hello");
   return response.data;
 };
+
+

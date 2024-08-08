@@ -7,7 +7,6 @@ import {
   RadioGroup,
   FormControlLabel,
   FormControl,
-  FormLabel,
   Button,
   Grid,
   Typography,
@@ -19,12 +18,14 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  SelectChangeEvent,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import styles from "../styles/CreatePage.module.css"; // Import the CSS module
 import Link from "next/link";
-import { fetchCustomerDetails } from "../services/api"; // Adjust import path as necessary
+import { agreement, fetchCustomerDetails } from "../services/api"; // Adjust import path as necessary
 import { useRouter } from "next/router";
+import axios from "axios";
 
 interface Quote {
   quoteNumber: string;
@@ -56,10 +57,9 @@ const CreatePage = () => {
     city: "",
     state: "",
     Zip: "",
-    file: null,
   });
-  const router = useRouter()
-  const [selectedValue, setSelectedValue] = useState<string>('');
+  const router = useRouter();
+  const [selectedValue, setSelectedValue] = useState<string>("");
   const [Add2, setAdd2] = useState([
     {
       Buisness: "",
@@ -70,14 +70,34 @@ const CreatePage = () => {
       Zip: "",
     },
   ]);
+  const [quotes, setQuotes] = useState<Quote[]>([
+    {
+      quoteNumber: "",
+      policyNumber: "",
+      carrierCompany: "",
+      wholesaler: "",
+      coverage: "",
+      effectiveDate: "",
+      expirationDate: "",
+      minDaysToCancel: 0,
+      minEarnedRate: 0,
+      premium: 0,
+      taxes: 0,
+      otherFees: 0,
+      brokerFee: 0,
+      policyFee: 0,
+      commission: 0,
+      agencyFees: 0,
+      file: null,
+    },
+  ]);
 
   const [isAutocompleteComplete, setIsAutocompleteComplete] = useState(false);
   const [customerType, setCustomerType] = useState<string | null>("personal");
-  const [emailError, setEmailError] = useState<string>(""); // State to hold error message
+  const [emailError, setEmailError] = useState<string>("");
   const [activeStep, setActiveStep] = useState(0);
   const steps = ["Select or create a customer", "Upload Quote", "Review Quote"];
   const showBusinessForm = customerType === "commercial";
-  // const [quotes, setQuotes] = useState<Quote[]>([{ text: "", file: null }]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,11 +107,11 @@ const CreatePage = () => {
     });
   };
 
-  const handleBusinessInputChange = (index: number, e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
-    const newBusinessDetails = Add2.map((business, i) => (
-      i === index ? { ...business, [e.target.name as string]: e.target.value as string } : business
-    ));
-    setAdd2(newBusinessDetails);
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    setAdd1({
+      ...Add1,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,47 +151,38 @@ const CreatePage = () => {
     }
   };
 
-  const handleNext = () => {
-    if (activeStep === 0 && !isAutocompleteComplete) {
-      // Only move to the next step if the email is found
-      return;
-    }
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const [quotes, setQuotes] = useState<Quote[]>([
-    {
-      quoteNumber: "",
-      policyNumber: "",
-      carrierCompany: "",
-      wholesaler: "",
-      coverage: "",
-      effectiveDate: "",
-      expirationDate: "",
-      minDaysToCancel: 0,
-      minEarnedRate: 0,
-      premium: 0,
-      taxes: 0,
-      otherFees: 0,
-      brokerFee: 0,
-      policyFee: 0,
-      commission: 0,
-      agencyFees: 0,
-      file: null,
-    },
-  ]);
-
   const handleQuoteChange = (index: any, event: any) => {
     const { name, value } = event.target;
+
     setQuotes((prevQuotes) => {
       const updatedQuotes = [...prevQuotes];
-      updatedQuotes[index] = { ...updatedQuotes[index], [name]: value };
+      let newValue;
+
+      switch (name) {
+        case "minDaysToCancel":
+        case "minEarnedRate":
+        case "premium":
+        case "taxes":
+        case "otherFees":
+        case "brokerFee":
+        case "policyFee":
+        case "commission":
+        case "agencyFees":
+          newValue = Number(value);
+          break;
+        default:
+          newValue = value;
+      }
+
+      updatedQuotes[index] = { ...updatedQuotes[index], [name]: newValue };
       return updatedQuotes;
     });
+
+    console.log(quotes);
   };
 
   const handleFileChange = (index: any, event: any) => {
@@ -181,17 +192,6 @@ const CreatePage = () => {
       updatedQuotes[index] = { ...updatedQuotes[index], file };
       return updatedQuotes;
     });
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setUploadedFiles([...uploadedFiles, ...Array.from(event.target.files)]);
-    }
-  };
-
-  const handleRemoveFile = (index: number) => {
-    const newFiles = uploadedFiles.filter((_, i) => i !== index);
-    setUploadedFiles(newFiles);
   };
 
   const addNewQuote = () => {
@@ -231,10 +231,30 @@ const CreatePage = () => {
         Add1.state &&
         Add1.Zip
       );
+    } else if (step === 1) {
+      return quotes.every(
+        (quote) =>
+          quote.quoteNumber &&
+          quote.policyNumber &&
+          quote.carrierCompany &&
+          quote.wholesaler &&
+          quote.coverage &&
+          quote.effectiveDate &&
+          quote.expirationDate &&
+          quote.minDaysToCancel !== undefined &&
+          quote.minEarnedRate !== undefined &&
+          quote.premium !== undefined &&
+          quote.taxes !== undefined &&
+          quote.otherFees !== undefined &&
+          quote.brokerFee !== undefined &&
+          quote.policyFee !== undefined &&
+          quote.commission !== undefined &&
+          quote.agencyFees !== undefined
+      );
     }
     return true;
   };
-  
+
   const removeQuote = (index: any) => {
     if (quotes.length > 1) {
       setQuotes((prevQuotes) => prevQuotes.filter((_, i) => i !== index));
@@ -271,16 +291,62 @@ const CreatePage = () => {
       city: "",
       state: "",
       Zip: "",
-      file: null,
     });
     setQuotes([emptyQuoteTemplate]);
     setIsAutocompleteComplete(false);
-    setEmailError(""); // Clear error message on reset
+    setEmailError("");
   };
 
-  const handleFinish = () => {
-    alert("Agreement created successfully!");
-    router.push("/dashboard");
+  const handleNext = async () => {
+    if (!isStepComplete(activeStep)) {
+      alert("Please fill in all required fields before proceeding.");
+      return;
+    }
+
+    if (activeStep === steps.length - 1) {
+      try {
+        await axios.post(
+          "http://localhost:3001/agreement",
+          { Add1, Add2, quotes },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        alert("Form submitted successfully!");
+        router.push("/dashboard");
+      } catch (error) {
+        console.error("Error submitting form", error);
+        alert("Error submitting form");
+      }
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
+  };
+
+  const calculateTotalCost = () => {
+    return quotes
+      .map((quote) => {
+        const premium = Number(quote.premium) || 0;
+        const taxes = Number(quote.taxes) || 0;
+        const otherFees = Number(quote.otherFees) || 0;
+        const brokerFee = Number(quote.brokerFee) || 0;
+        const policyFee = Number(quote.policyFee) || 0;
+        const commission = Number(quote.commission) || 0;
+        const agencyFees = Number(quote.agencyFees) || 0;
+
+        return (
+          premium +
+          taxes +
+          otherFees +
+          brokerFee +
+          policyFee +
+          commission +
+          agencyFees
+        );
+      })
+      .reduce((acc, cost) => acc + cost, 0);
   };
 
   return (
@@ -397,17 +463,17 @@ const CreatePage = () => {
                 />
               </Grid>
               <Grid item xs={12} md={4}>
-              <FormControl fullWidth margin="normal" variant="outlined">
+                <FormControl fullWidth margin="normal" variant="outlined">
                   <InputLabel id="state-label">State</InputLabel>
                   <Select
                     labelId="state-label"
                     name="state"
                     value={Add1.state}
-                    onChange={handleInputChange}
+                    onChange={handleSelectChange}
                     label="State"
                   >
-                    <MenuItem value="Indore">Indore</MenuItem>
-                    <MenuItem value="Bhopal">Bhopal</MenuItem>
+                    <MenuItem value="MP">MP</MenuItem>
+                    <MenuItem value="UP">UP</MenuItem>
                     <MenuItem value="Delhi">Delhi</MenuItem>
                     {/* Add more states as needed */}
                   </Select>
@@ -458,16 +524,16 @@ const CreatePage = () => {
               Add2.map((business, index) => (
                 <div key={index} className={styles.businessForm}>
                   <Typography variant="h6" className={styles.heading3}>
-                  <div className={styles.quoteHeader}>
-                    Busuiness Form {index + 1}
-                    <IconButton
-                      onClick={() => removeBusiness(index)}
-                      className={styles.deleteButton}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </div>
-                </Typography>
+                    <div className={styles.quoteHeader}>
+                      Busuiness Form {index + 1}
+                      <IconButton
+                        onClick={() => removeBusiness(index)}
+                        className={styles.deleteButton}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </div>
+                  </Typography>
                   <TextField
                     name="Buisness"
                     label="Business Name"
@@ -572,29 +638,26 @@ const CreatePage = () => {
                 Add More
               </Button>
             )}
-            <Typography variant="h6" className={styles.heading3} style={{color: "black"}}>  
-            <br />
-            Would you like to add a contact/deligate?
+            <Typography
+              variant="h6"
+              className={styles.heading3}
+              style={{ color: "black" }}
+            >
+              <br />
+              Would you like to add a contact/deligate?
             </Typography>
-            <Typography >
-              Person that will act on behalf of the customer or business and be listed as the signee
+            <Typography>
+              Person that will act on behalf of the customer or business and be
+              listed as the signee
             </Typography>
             <FormControl component="fieldset" margin="normal">
               <RadioGroup
                 row
                 value={selectedValue} // Controlled value
-        onChange={handleChange} // Handle change
+                onChange={handleChange} // Handle change
               >
-                <FormControlLabel
-                  value="yes"
-                  control={<Radio />}
-                  label="Yes"
-                />
-                <FormControlLabel
-                  value="no"
-                  control={<Radio />}
-                  label="No"
-                />
+                <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                <FormControlLabel value="no" control={<Radio />} label="No" />
               </RadioGroup>
             </FormControl>
           </div>
@@ -877,38 +940,252 @@ const CreatePage = () => {
           </div>
         )}
         {activeStep === 2 && (
-          <div className={styles.formSection}>
-            <Typography variant="h6">Review Your Details</Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Typography>Email: {Add1.email}</Typography>
-                <Typography>First Name: {Add1.firstname}</Typography>
-                <Typography>Last Name: {Add1.lastname}</Typography>
-                <Typography>Contact: {Add1.contact}</Typography>
-                <Typography>Address: {Add1.Address}</Typography>
-                <Typography>City: {Add1.city}</Typography>
-                <Typography>State: {Add1.state}</Typography>
-                <Typography>Zip: {Add1.Zip}</Typography>
+          <div className={styles.step2Container}>
+            <Typography variant="h4" className={styles.step2Header}>
+              Review Your Details:
+            </Typography>
+            <Grid container spacing={2} className={styles.step2Grid}>
+              <Grid item xs={12} md={6} className={styles.step2Group}>
+                <Typography variant="h6">
+                  <span>Email:</span> {Add1.email}
+                </Typography>
+                <Typography variant="h6">
+                  <span>First Name:</span> {Add1.firstname}
+                </Typography>
+                <Typography variant="h6">
+                  <span>Last Name:</span> {Add1.lastname}
+                </Typography>
+                <Typography variant="h6">
+                  <span>Address:</span> {Add1.Address}
+                </Typography>
+                <Typography variant="h6">
+                  <span>City:</span> {Add1.city}
+                </Typography>
+                <Typography variant="h6">
+                  <span>State:</span> {Add1.state}
+                </Typography>
+                <Typography variant="h6">
+                  <span>Zip:</span> {Add1.Zip}
+                </Typography>
+                <Typography variant="h6">
+                  <span>Contact:</span> {Add1.contact}
+                </Typography>
               </Grid>
-              {/* Add more fields if needed */}
             </Grid>
-            <Box mt={2}>
-              <Button variant="contained" color="primary" onClick={handleFinish}>
-                Finish
-              </Button>
-            </Box>
+            <FormControl component="fieldset" margin="normal">
+              <RadioGroup value={customerType}>
+                {customerType === "personal" ? (
+                  <FormControlLabel
+                    value="personal"
+                    control={<Radio />}
+                    label="Personal Customer"
+                  />
+                ) : (
+                  <>
+                    <FormControlLabel
+                      value="commercial"
+                      control={<Radio />}
+                      label="Commercial Customer"
+                    />
+                    <Box mt={2}>
+                      {Add2.map((business, index) => (
+                        <Box key={index} className={styles.step2QuoteContainer}>
+                          <Typography
+                            variant="h5"
+                            className={styles.step2QuoteHeader}
+                          >
+                            Business Form {index + 1} :
+                          </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                              <Typography variant="body1">
+                                <strong>Business Name:</strong>{" "}
+                                {business.Buisness}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Typography variant="body1">
+                                <strong>Lane Address:</strong>{" "}
+                                {business.Address}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Typography variant="body1">
+                                <strong>Lane Address2:</strong>{" "}
+                                {business.Address2}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <Typography variant="body1">
+                                <strong>City:</strong> {business.city}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <Typography variant="body1">
+                                <strong>State:</strong> {business.state}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Typography variant="body1">
+                                <strong>Zip Code:</strong> {business.Zip}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      ))}
+                    </Box>
+                  </>
+                )}
+              </RadioGroup>
+            </FormControl>
+            <Typography>
+              -- Person that will act on behalf of the customer or business and
+              be listed as the signee :
+            </Typography>
+            <FormControl component="fieldset" margin="normal">
+              <RadioGroup row value={selectedValue}>
+                <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                <FormControlLabel value="no" control={<Radio />} label="No" />
+              </RadioGroup>
+            </FormControl>
+            {quotes.map((quote, index) => (
+              <Container key={index} className={styles.step2QuoteContainer}>
+                <Typography variant="h5" className={styles.step2QuoteHeader}>
+                  Quote {index + 1}
+                </Typography>
+                <Typography variant="h5" style={{ color: "black" }}>
+                  Attached documents :
+                </Typography>
+                {quote.file && (
+                  <>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Quote Number : </strong> {quote.quoteNumber}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Policy Number : </strong> {quote.policyNumber}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Carrier Company : </strong>{" "}
+                          {quote.carrierCompany}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Wholesaler : </strong> {quote.wholesaler}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Coverage : </strong> {quote.coverage}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Effective Date : </strong>{" "}
+                          {quote.effectiveDate}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Expiration Date : </strong>{" "}
+                          {quote.expirationDate}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography fontSize={"20px"} color={"#007bff"}>
+                      <strong>Provided by carrier :</strong>
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Minimum Days to Cancel : </strong>{" "}
+                          {quote.minDaysToCancel}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Minimum Earned Rate : </strong>{" "}
+                          {quote.minEarnedRate}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography fontSize={"20px"} color={"#007bff"}>
+                      <strong>Financeable : </strong>
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Premium : </strong> {quote.premium}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Taxes : </strong> {quote.taxes}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography fontSize={"20px"} color={"#007bff"}>
+                      <strong>Non Financeable : </strong>
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="body1">
+                          <strong>Other Fees : </strong> {quote.otherFees}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="body1">
+                          <strong>Broker Fee : </strong> {quote.brokerFee}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="body1">
+                          <strong>Policy Fee : </strong> {quote.policyFee}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography fontSize={"20px"} color={"#007bff"}>
+                      <strong>Payment Distribution : </strong>
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Comission : </strong> {quote.commission}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body1">
+                          <strong>Agency Fees : </strong> {quote.agencyFees}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="h6">
+                      Total Cost: ${calculateTotalCost()}
+                    </Typography>
+                  </>
+                )}
+              </Container>
+            ))}
           </div>
         )}
-         <Box display="flex" justifyContent="space-between" mt={2}>
+        <Box display="flex" justifyContent="space-between" mt={2}>
           <Button disabled={activeStep === 0} onClick={handleBack}>
             Back
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNext}
-          >
-            {activeStep === steps.length - 1 ? "Finish" : "Next"}
+          <Button variant="contained" color="primary" onClick={handleNext}>
+            {activeStep === steps.length - 1 ? "Submit" : "Next"}
           </Button>
         </Box>
       </Card>

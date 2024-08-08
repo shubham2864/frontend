@@ -159,3 +159,58 @@
     opacity: 1;
   }
 }
+
+
+/* Styles specific to activeStep === 2 */
+.step2Container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.step2Header {
+  font-size: 1.75em;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.step2Grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.step2Group {
+  flex: 1;
+  min-width: 300px;
+}
+
+.step2QuoteContainer {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.step2QuoteHeader {
+  background-color: #007bff;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.step2TotalCost {
+  font-size: 1.5rem;
+  color: #007bff;
+  font-weight: 600;
+  margin-top: 20px;
+  text-align: center;
+}

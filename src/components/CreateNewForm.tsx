@@ -37,6 +37,7 @@ const UserForm = () => {
       ...prevUser,
       [name!]: value,
     }));
+    console.log(user.firstName)
   };
 
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
@@ -53,11 +54,15 @@ const UserForm = () => {
     try {
       const token = localStorage.getItem('token');
       if (id && id !== 'new') {
-        console.log("helloooo23344")
         // await updateProfile(user, token);
       } else {
-        console.log("helloooo23111344")
-        await newUser(user);
+        try{
+          await newUser(user);
+        }
+        catch(error){
+          console.log(error)
+          alert("User Already Exists")
+        }
       }
       router.push('/settings');
     } catch (error) {
@@ -129,7 +134,7 @@ const UserForm = () => {
             </Select>
           </FormControl>
           <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3 }}>
-            {id === 'new' ? 'Create' : 'Update'}
+            Create
           </Button>
         </Box>
       </Box>
