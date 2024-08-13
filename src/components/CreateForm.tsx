@@ -664,279 +664,283 @@ const CreatePage = () => {
         )}
         {activeStep === 1 && (
           <div>
-            {quotes.map((quote, index) => (
-              <Container key={index} className={styles.quoteContainer}>
-                <Typography variant="h5" className={styles.heading3}>
-                  <div className={styles.quoteHeader}>
-                    Quote {index + 1}
-                    <IconButton
-                      onClick={() => removeQuote(index)}
-                      className={styles.deleteButton}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </div>
-                </Typography>
-                <Typography className={styles.heading4}>Documents</Typography>
-                <Typography
-                  className={styles.heading4}
-                  style={{ color: "black" }}
-                >
-                  Attach quote documents, evidence of insurance, and other
-                  documents to your customer's agreement and manage which
-                  documents your customer can view.
-                </Typography>
-                <Button
-                  variant="contained"
-                  component="label"
-                  color="primary"
-                  fullWidth
-                  className={styles.uploadButton}
-                >
-                  Upload File
-                  <input
-                    type="file"
-                    name="file"
-                    accept=".pdf"
-                    hidden
-                    onChange={(e) => handleFileChange(index, e)}
-                  />
-                  {quote.file && (
-                    <Typography variant="body1">: {quote.file.name}</Typography>
-                  )}
-                </Button>
-                {quote.file && (
-                  <>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="quoteNumber"
-                          label="Quote Number"
-                          value={quote.quoteNumber}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="policyNumber"
-                          label="Policy Number"
-                          value={quote.policyNumber}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="carrierCompany"
-                          label="Carrier Company"
-                          value={quote.carrierCompany}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="wholesaler"
-                          label="Wholesaler"
-                          value={quote.wholesaler}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
-                      </Grid>
-                    </Grid>
-                    <TextField
-                      name="coverage"
-                      label="Coverage"
-                      value={quote.coverage}
-                      onChange={(e) => handleQuoteChange(index, e)}
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
+            <Container>
+              {quotes.map((quote, index) => (
+                <Container key={index} className={styles.quoteContainer}>
+                  <Typography variant="h5" className={styles.heading3}>
+                    <div className={styles.quoteHeader}>
+                      Quote {index + 1}
+                      <IconButton
+                        onClick={() => removeQuote(index)}
+                        className={styles.deleteButton}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </div>
+                  </Typography>
+                  <Typography className={styles.heading4}>Documents</Typography>
+                  <Typography
+                    className={styles.heading4}
+                    style={{ color: "black" }}
+                  >
+                    Attach quote documents, evidence of insurance, and other
+                    documents to your customer's agreement and manage which
+                    documents your customer can view.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    component="label"
+                    color="primary"
+                    fullWidth
+                    className={styles.uploadButton}
+                  >
+                    Upload File
+                    <input
+                      type="file"
+                      name="file"
+                      accept=".pdf"
+                      hidden
+                      onChange={(e) => handleFileChange(index, e)}
                     />
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="effectiveDate"
-                          label="Effective Date"
-                          type="date"
-                          value={quote.effectiveDate}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
+                    {quote.file && (
+                      <Typography variant="body1">
+                        : {quote.file.name}
+                      </Typography>
+                    )}
+                  </Button>
+                  {quote.file && (
+                    <>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="quoteNumber"
+                            label="Quote Number"
+                            value={quote.quoteNumber}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="policyNumber"
+                            label="Policy Number"
+                            value={quote.policyNumber}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="expirationDate"
-                          label="Expiration Date"
-                          type="date"
-                          value={quote.expirationDate}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="carrierCompany"
+                            label="Carrier Company"
+                            value={quote.carrierCompany}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="wholesaler"
+                            label="Wholesaler"
+                            value={quote.wholesaler}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
                       </Grid>
-                    </Grid>
-                    <Typography className={styles.heading4}>
-                      Provided by carrier
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="minDaysToCancel"
-                          label="Minimum Days to Cancel"
-                          type="number"
-                          value={quote.minDaysToCancel}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
+                      <TextField
+                        name="coverage"
+                        label="Coverage"
+                        value={quote.coverage}
+                        onChange={(e) => handleQuoteChange(index, e)}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="effectiveDate"
+                            label="Effective Date"
+                            type="date"
+                            value={quote.effectiveDate}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="expirationDate"
+                            label="Expiration Date"
+                            type="date"
+                            value={quote.expirationDate}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="minEarnedRate"
-                          label="Minimum Earned Rate"
-                          type="number"
-                          value={quote.minEarnedRate}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
+                      <Typography className={styles.heading4}>
+                        Provided by carrier
+                      </Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="minDaysToCancel"
+                            label="Minimum Days to Cancel"
+                            type="number"
+                            value={quote.minDaysToCancel}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="minEarnedRate"
+                            label="Minimum Earned Rate"
+                            type="number"
+                            value={quote.minEarnedRate}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
                       </Grid>
-                    </Grid>
-                    <Typography className={styles.heading4}>
-                      Financeable
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="premium"
-                          label="Premium"
-                          type="number"
-                          value={quote.premium}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
+                      <Typography className={styles.heading4}>
+                        Financeable
+                      </Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="premium"
+                            label="Premium"
+                            type="number"
+                            value={quote.premium}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="taxes"
+                            label="Taxes"
+                            type="number"
+                            value={quote.taxes}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="taxes"
-                          label="Taxes"
-                          type="number"
-                          value={quote.taxes}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
+                      <Typography className={styles.heading4}>
+                        Non Financeable
+                      </Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={4}>
+                          <TextField
+                            name="otherFees"
+                            label="Other Fees"
+                            type="number"
+                            value={quote.otherFees}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <TextField
+                            name="brokerFee"
+                            label="Broker Fee"
+                            type="number"
+                            value={quote.brokerFee}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <TextField
+                            name="policyFee"
+                            label="Policy Fee"
+                            type="number"
+                            value={quote.policyFee}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
                       </Grid>
-                    </Grid>
-                    <Typography className={styles.heading4}>
-                      Non Financeable
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={4}>
-                        <TextField
-                          name="otherFees"
-                          label="Other Fees"
-                          type="number"
-                          value={quote.otherFees}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
+                      <Typography className={styles.heading4}>
+                        Payment distribution
+                      </Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="commission"
+                            label="Commission"
+                            type="number"
+                            value={quote.commission}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="agencyFees"
+                            label="Agency Fees"
+                            type="number"
+                            value={quote.agencyFees}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} md={4}>
-                        <TextField
-                          name="brokerFee"
-                          label="Broker Fee"
-                          type="number"
-                          value={quote.brokerFee}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <TextField
-                          name="policyFee"
-                          label="Policy Fee"
-                          type="number"
-                          value={quote.policyFee}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
-                      </Grid>
-                    </Grid>
-                    <Typography className={styles.heading4}>
-                      Payment distribution
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="commission"
-                          label="Commission"
-                          type="number"
-                          value={quote.commission}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TextField
-                          name="agencyFees"
-                          label="Agency Fees"
-                          type="number"
-                          value={quote.agencyFees}
-                          onChange={(e) => handleQuoteChange(index, e)}
-                          fullWidth
-                          margin="normal"
-                          variant="outlined"
-                        />
-                      </Grid>
-                    </Grid>
-                  </>
-                )}
-              </Container>
-            ))}
-            <br />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={addNewQuote}
-              startIcon={<Add />}
-            >
-              Add Quotes
-            </Button>
+                    </>
+                  )}
+                </Container>
+              ))}
+              <br />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={addNewQuote}
+                startIcon={<Add />}
+              >
+                Add Quotes
+              </Button>
+            </Container>
           </div>
         )}
         {activeStep === 2 && (

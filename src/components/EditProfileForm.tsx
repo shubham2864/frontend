@@ -187,6 +187,7 @@ const EditProfile = () => {
               value={formData.email}
               onChange={handleChange}
               className={styles.inputField}
+              readOnly
             />
           </div>
           <div className={styles.formGroup}>

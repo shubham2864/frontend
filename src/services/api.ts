@@ -101,26 +101,33 @@ export const getProfile = async (token: any) => {
   });
 };
 
+export const getSingleProfile = async (email: any) => {
+  console.log("helloEMAILLL " + email);
+  const response = await api.get(`/user/${email}`);
+  console.log("Customer details: ", response);
+  return response.data
+};
+
 export const updateProfile = async (
   userData: {
-    companyName: string;
-    mobileNumber: string;
+    companyName?: string;
+    mobileNumber?: string;
     website?: string;
-    streetAddress: string;
+    streetAddress?: string;
     streetAddress2?: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    phoneNumber: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    firstName?: string;
+    lastName?: string;
+    // email?: string;
+    password?: string;
+    confirmPassword?: string;
+    phoneNumber?: string;
   },
-  token: any
+  token?: any
 ) => {
-  console.log(userData);
+  console.log("ITSSSSS USER DATTATATA",userData);
   return await api.put("/user/profile", userData);
 };
 

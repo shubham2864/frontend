@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../styles/Navbar.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/router";
@@ -13,6 +13,7 @@ import {
   faArrowAltCircleLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
+import { getProfile } from "@/services/api";
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -20,13 +21,31 @@ const Navbar: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
+  const [companyName, setCompanyName] = useState("NULL");
   const hideNavbarRoutes = ["/otp", "/login", "/register"];
   const hideNavbar = hideNavbarRoutes.includes(router.pathname);
 
   const handleCreateClick = () => {
     setModalOpen(true);
   };
+
+  useEffect(() => {
+    const getCompanyName = async () => {
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("token");
+        if (token) {
+          try {
+            const data = await getProfile(token as string);
+            console.log(data.data.companyName);
+            setCompanyName(data.data.companyName);
+          } catch (error) {
+            console.log("Error fetching company name", error);
+          }
+        }
+      }
+    };
+    getCompanyName();
+  }, []);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -41,7 +60,7 @@ const Navbar: React.FC = () => {
     } else if (option === "invoice") {
       router.push("/invoice");
     }
-    setSidebarOpen(false)
+    setSidebarOpen(false);
   };
 
   if (hideNavbar) {
@@ -102,7 +121,7 @@ const Navbar: React.FC = () => {
               className={styles.brand}
               onClick={() => router.push("/dashboard")}
             >
-              <p style={{ color: "white", cursor: "pointer" }}>ABC Insurance</p>
+              <p style={{ color: "white", cursor: "pointer" }}>{companyName}</p>
             </div>
             <div className={styles.profileIcons}>
               <div className={styles.settingsIcon}>

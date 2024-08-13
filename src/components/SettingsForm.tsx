@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Modal from "../components/Modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
-import { getProfile, getUsers } from "@/services/api";
+import { getProfile, getSingleProfile, getUsers, updateProfile } from "@/services/api";
 import { useRouter } from "next/router";
 import {
   Card,
@@ -65,7 +64,6 @@ const FieldWithValue: React.FC<FieldWithValueProps> = ({ label, value }) => (
 
 const SettingsForm = () => {
   const [activeTab, setActiveTab] = useState("userManagement");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [profile, setProfile] = useState({
     firstName: "",
     lastName: "",
@@ -80,7 +78,9 @@ const SettingsForm = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [editOrgDialogOpen, setEditOrgDialogOpen] = useState(false);
   const [editBankDialogOpen, setEditBankDialogOpen] = useState(false);
+  const [editProfileDialogOpen, setEditProfileDialogOpen] = useState(false);
   const [verified, setVerified] = useState("Pending");
+  const [profileToEdit, setProfileToEdit] = useState<Partial<User>>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -109,16 +109,8 @@ const SettingsForm = () => {
     setActiveTab(tab);
   };
 
-  const handleModalOpen = () => {
+  const handleOpen = () => {
     router.push("/create-new");
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleSelect = (option: string) => {
-    setIsModalOpen(false);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +122,8 @@ const SettingsForm = () => {
       user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.phoneNumber.includes(searchQuery)
+      user.phoneNumber.includes(searchQuery) ||
+      user.role.includes(searchQuery)
   );
 
   const handleOpenEditOrgDialog = () => {
@@ -149,6 +142,38 @@ const SettingsForm = () => {
   const handleCloseEditBankDialog = () => {
     setEditBankDialogOpen(false);
   };
+
+  const handleOpenEditProfileDialog = async (email: string) => {
+    try {
+      const Profile = await getSingleProfile(email);
+      setProfileToEdit({
+        firstName: Profile.firstName,
+        lastName: Profile.lastName,
+        phoneNumber: Profile.phoneNumber,
+        email: Profile.email,
+        role: Profile.role,
+      });
+      setEditProfileDialogOpen(true);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
+  };
+
+  const handleCloseEditProfileDialog = async () => {
+    setEditProfileDialogOpen(false);
+  };
+
+  const handleSaveProfile = async () => {
+    const updatedProfileResponse = await updateProfile(profileToEdit); // Axios response
+    const updatedProfileData = updatedProfileResponse.data; // Extract the data
+    setUsers((prevUsers) => 
+      prevUsers.map((user) =>
+        user.email === updatedProfileData.email ? updatedProfileData : user
+      )
+    );
+    alert('Profile updated successfully!');
+    handleCloseEditProfileDialog();
+  }
 
   return (
     <div className={styles.settingsContainer}>
@@ -200,18 +225,26 @@ const SettingsForm = () => {
           <div className={styles.userManagement}>
             <div className={styles.headerRow}>
               <h2>Users</h2>
-              <div className={styles.searchAdd}>
-                <input
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className={styles.searchBar}
-                />
-                <button className={styles.addButton} onClick={handleModalOpen}>
-                  Add New
-                </button>
-              </div>
+              {profile.role == "admin" ? (
+                <div className={styles.searchAdd}>
+                  <div className={styles.headerRow}>
+                    <input
+                      type="text"
+                      placeholder="Search"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      className={styles.searchBar}
+                    />
+                    <button className={styles.addButton} onClick={handleOpen}>
+                      Add New
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h2>User</h2>
+                </>
+              )}
             </div>
             <p>Manage users across divisions you are an admin of.</p>
             <table className={styles.userTable}>
@@ -237,7 +270,7 @@ const SettingsForm = () => {
                       <td>
                         <button
                           className={styles.editButton}
-                          onClick={() => router.push("/create-new")}
+                          onClick={()=> handleOpenEditProfileDialog(user.email)}
                         >
                           ✏️
                         </button>
@@ -255,7 +288,7 @@ const SettingsForm = () => {
                     <td>
                       <button
                         className={styles.editButton}
-                        onClick={() => router.push("/create-new")}
+                        onClick={()=> handleOpenEditProfileDialog(profile.email)}
                       >
                         ✏️
                       </button>
@@ -267,9 +300,19 @@ const SettingsForm = () => {
           </div>
         )}
         {activeTab === "organizationDetails" && (
-          <div>
-            <div style={{ display: "flex", alignItems: "center", marginLeft: "200px" }}>
-              <h2 style={{ margin: "10px" }}>Business and bank details</h2>
+          <div style={{ width: "100%", maxWidth: "1500px", margin: "0 auto" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                margin: "0 auto",
+                marginBottom: "-5px",
+                paddingLeft: "2%",
+              }}
+            >
+              <h2 style={{ margin: "8px 1%", marginLeft: "-15px" }}>
+                Business and bank details
+              </h2>
               <p
                 style={{
                   margin: 0,
@@ -283,13 +326,20 @@ const SettingsForm = () => {
                 {verified}
               </p>
             </div>
-            <p style={{ marginTop: "0px", marginLeft: "210px", }}>
-              Business and bank details shoudl go where you have Test Insurance
+            <p
+              style={{
+                marginTop: "0px",
+                paddingLeft: "3%",
+                marginLeft: "-30px",
+              }}
+            >
+              Business and bank details should go where you have Test Insurance
             </p>
             <StyledCard
               sx={{
-                margin: "auto",
-                width: "1500px", // Adjust the width
+                margin: "0 auto",
+                width: "100%", // Use percentage width
+                maxWidth: "1500px", // Limit the maximum width
                 height: "fit-content", // Adjust the height
                 marginBottom: "10px",
                 boxShadow: 3, // Optional: Add shadow
@@ -325,16 +375,6 @@ const SettingsForm = () => {
                 <FieldWithValue label="Type" value="llc" />
                 <div style={{ borderBottom: "1px dotted #000" }}></div>
               </CardContent>
-            </StyledCard>
-            <StyledCard
-              sx={{
-                margin: "auto",
-                width: "1500px", // Adjust the width
-                height: "fit-content", // Adjust the height
-                boxShadow: 3, // Optional: Add shadow
-                borderRadius: "8px",
-              }}
-            >
               <CardHeader
                 title="Bank Details"
                 action={
@@ -377,7 +417,7 @@ const SettingsForm = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={editBankDialogOpen} onClose={handleCloseEditBankDialog}>
+      <Dialog open={editBankDialogOpen} onClose={handleCloseEditProfileDialog}>
         <DialogTitle>Edit Bank Details</DialogTitle>
         <DialogContent>
           <TextField label="Bank Name" fullWidth margin="normal" />
@@ -396,11 +436,84 @@ const SettingsForm = () => {
         </DialogActions>
       </Dialog>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        onSelect={handleSelect}
-      />
+      {/* Profile Dialog*/}
+      <Dialog
+        open={editProfileDialogOpen}
+        onClose={handleCloseEditProfileDialog}
+      >
+        <DialogTitle>Edit Profile</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="First Name"
+            fullWidth
+            margin="normal"
+            value={profileToEdit.firstName || ""}
+            onChange={(e) =>
+              setProfileToEdit((prev) => ({
+                ...prev,
+                firstName: e.target.value,
+              }))
+            }
+          />
+          <TextField
+            label="Last Name"
+            fullWidth
+            margin="normal"
+            value={profileToEdit.lastName || ""}
+            onChange={(e) =>
+              setProfileToEdit((prev) => ({
+                ...prev,
+                lastName: e.target.value,
+              }))
+            }
+          />
+          <TextField
+            label="Phone"
+            fullWidth
+            margin="normal"
+            value={profileToEdit.phoneNumber || ""}
+            onChange={(e) =>
+              setProfileToEdit((prev) => ({
+                ...prev,
+                phoneNumber: e.target.value,
+              }))
+            }
+          />
+          <TextField
+            label="Email"
+            fullWidth
+            margin="normal"
+            value={profileToEdit.email || ""}
+            disabled
+          />
+          <TextField
+            label="Role"
+            fullWidth
+            margin="normal"
+            value={profileToEdit.role || ""}
+            onChange={(e) =>
+              setProfileToEdit((prev) => ({
+                ...prev,
+                role: e.target.value,
+              }))
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditProfileDialog} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              // Handle save logic here
+              handleSaveProfile();
+            }}
+            color="primary"
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

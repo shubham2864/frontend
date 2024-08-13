@@ -1,70 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { TextField, Button, Container, Typography, Box, MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
-import { getProfile, updateProfile, signUp, newUser } from '@/services/api';  // Adjust the path if necessary
-import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Box,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  SelectChangeEvent,
+} from "@mui/material";
+import { getProfile, updateProfile, signUp, newUser } from "@/services/api"; // Adjust the path if necessary
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import styles from "../styles/Settings.module.css";
 
 const UserForm = () => {
   const router = useRouter();
   const { id } = router.query;
   const [user, setUser] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    role: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    organization: "",
+    role: "",
   });
 
+  const [companyName, setCompanyName] = useState("")
+
+  const getCompanyName = async () => {
+    const token = localStorage.getItem("token");
+    const data = await getProfile(token)
+    setCompanyName(data.data.companyName)
+  }
+
+  getCompanyName();
+
   useEffect(() => {
-    if (id && id !== 'new') {
-      const token = localStorage.getItem('token');
+    if (id && id !== "new") {
+      const token = localStorage.getItem("token");
       getProfile(token)
-        .then(response => {
+        .then((response) => {
           setUser(response.data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     }
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
+  ) => {
     const { name, value } = e.target;
-    setUser(prevUser => ({
+    setUser((prevUser) => ({
       ...prevUser,
       [name!]: value,
     }));
-    console.log(user.firstName)
+    console.log(user.firstName);
   };
 
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
-    setUser(prevUser => ({
+    setUser((prevUser) => ({
       ...prevUser,
       [name!]: value,
     }));
   };
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      if (id && id !== 'new') {
+      const token = localStorage.getItem("token");
+      if (id && id !== "new") {
         // await updateProfile(user, token);
       } else {
-        try{
+        try {
           await newUser(user);
-        }
-        catch(error){
-          console.log(error)
-          alert("User Already Exists")
+        } catch (error) {
+          console.log(error);
+          alert("User Already Exists");
         }
       }
-      router.push('/settings');
+      router.push("/settings");
     } catch (error) {
       console.error(error);
     }
@@ -81,9 +103,16 @@ const UserForm = () => {
         </Link>
         <h1>New User</h1>
       </div>
-      <Box sx={{ marginTop: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Box
+        sx={{
+          marginTop: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <Typography component="h1" variant="h5">
-          {id === 'new' ? 'New User' : 'Edit User'}
+          {id === "new" ? "New User" : "Edit User"}
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <TextField
@@ -122,18 +151,30 @@ const UserForm = () => {
             value={user.phoneNumber}
             onChange={handleChange}
           />
+          <TextField
+            name="organization"
+            label="Organization"
+            fullWidth
+            margin="normal"
+            value={companyName}
+            InputProps={
+              { readOnly: true}
+            }
+          />
           <FormControl fullWidth margin="normal">
             <InputLabel>Role</InputLabel>
-            <Select
-              name="role"
-              value={user.role}
-              onChange={handleSelectChange}
-            >
+            <Select name="role" value={user.role} onChange={handleSelectChange}>
               <MenuItem value="user">User</MenuItem>
               <MenuItem value="admin">Admin</MenuItem>
             </Select>
           </FormControl>
-          <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3 }}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3 }}
+          >
             Create
           </Button>
         </Box>
