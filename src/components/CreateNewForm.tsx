@@ -30,13 +30,13 @@ const UserForm = () => {
     role: "",
   });
 
-  const [companyName, setCompanyName] = useState("")
+  const [companyName, setCompanyName] = useState("");
 
   const getCompanyName = async () => {
     const token = localStorage.getItem("token");
-    const data = await getProfile(token)
-    setCompanyName(data.data.companyName)
-  }
+    const data = await getProfile(token);
+    setCompanyName(data.data.companyName);
+  };
 
   getCompanyName();
 
@@ -157,9 +157,7 @@ const UserForm = () => {
             fullWidth
             margin="normal"
             value={companyName}
-            InputProps={
-              { readOnly: true}
-            }
+            InputProps={{ readOnly: true }}
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Role</InputLabel>

@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { verifyEmail } from '@/services/api';
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { verifyEmail } from "@/services/api";
 
 const VerifyEmail: React.FC = () => {
   const router = useRouter();
@@ -11,11 +11,11 @@ const VerifyEmail: React.FC = () => {
       try {
         if (token) {
           await verifyEmail(token as string);
-          router.push('/verified');
+          router.push("/verified");
         }
       } catch (error) {
-        console.error('Verification failed', error);
-        alert('Verification failed. Please try again.');
+        console.error("Verification failed", error);
+        alert("Verification failed. Please try again.");
       }
     };
 

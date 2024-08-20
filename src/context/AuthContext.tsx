@@ -1,17 +1,35 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/router';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
+import { useRouter } from "next/router";
+import { getCompanyDetails, getProfile } from "@/services/api";
 
 interface User {
   email: string;
 }
 
+interface Company {
+  _id: string;
+  companyName: string;
+  mobileNumber: string;
+  streetAddress: string;
+  city: string;
+  state: string;
+  zipCode: string;
+}
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  authChecked: boolean; // Add authChecked to the interface
+  authChecked: boolean;
   login: (email: string) => void;
   authenticate: () => void;
   logout: () => void;
+  companyDetails: Company | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,27 +42,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authChecked, setAuthChecked] = useState<boolean>(false); // New state to track auth check completion
+  const [companyDetails, setCompanyDetails] = useState<Company | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const email = localStorage.getItem('email');
-    const token = localStorage.getItem('token');
+    const email = localStorage.getItem("email");
+    const token = localStorage.getItem("token");
+    const otpVerified = localStorage.getItem("otpVerified");
+    const currentPath = router.pathname;
     if (email && token) {
       setUser({ email });
       setIsAuthenticated(true);
-      const otpVerified = localStorage.getItem('otpVerified');
-      if (otpVerified === 'true') {
-        router.push('/dashboard');
+
+      if (otpVerified === "true") {
+        compDetails(); 
+        if (currentPath === "/otp" || currentPath === "/login") {
+          router.push("/dashboard");
+        }
       } else {
-        router.push('/otp'); // Ensure user completes OTP verification
+        if (currentPath !== "/otp") {
+          router.push("/otp");
+        }
       }
     }
-    setAuthChecked(true); // Mark auth check as completed
+    setAuthChecked(true);
   }, []);
 
   const login = (email: string) => {
     setUser({ email });
-    localStorage.setItem('email', email);
+    localStorage.setItem("email", email);
   };
 
   const authenticate = () => {
@@ -54,14 +80,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('token');
-    localStorage.removeItem('email');
-    localStorage.removeItem('otpVerified'); // Clear OTP verification flag
-    router.push('/login');
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+    localStorage.removeItem("otpVerified"); // Clear OTP verification flag
+    router.push("/login");
+  };
+
+  const compDetails = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const data = await getProfile(token as string);
+        const companyDetailsData = await getCompanyDetails(data.data.companyId);
+        setCompanyDetails(companyDetailsData.data);
+      } catch (error) {
+        console.error("Failed to fetch company details:", error);
+      }
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, authChecked, login, authenticate, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        authChecked,
+        login,
+        authenticate,
+        logout,
+        companyDetails,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -70,7 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

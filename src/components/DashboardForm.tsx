@@ -4,12 +4,13 @@ import { useAuth } from "../context/AuthContext";
 import styles from "../styles/Dashboard.module.css";
 
 const DashboardForm: React.FC = () => {
-  const { user, isAuthenticated, authChecked } = useAuth();
+  const { isAuthenticated, authChecked } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (authChecked) { // Wait for the auth check to complete
-      const token = localStorage.getItem('token');
+    if (authChecked) {
+      // Wait for the auth check to complete
+      const token = localStorage.getItem("token");
       if (!token || !isAuthenticated) {
         router.push("/login");
       }
@@ -24,7 +25,9 @@ const DashboardForm: React.FC = () => {
     <div className={styles.dashboardContainer}>
       <div className={styles.statsContainer}>
         <div className={styles.statBox}>
-          <div className={styles.icon}><img src="/notification-bell.png" alt="Bell Icon" /></div>
+          <div className={styles.icon}>
+            <img src="/notification-bell.png" alt="Bell Icon" />
+          </div>
           <div className={styles.statInfo}>
             <p>Items need action</p>
             <p>0 Agreements</p>
@@ -35,15 +38,21 @@ const DashboardForm: React.FC = () => {
           </div>
         </div>
         <div className={styles.statBox}>
-          <div className={styles.icon}><img src="/quotes.png" alt="Quotes Icon" /></div>
+          <div className={styles.icon}>
+            <img src="/quotes.png" alt="Quotes Icon" />
+          </div>
           <div className={styles.statInfo}>
             <p>Incomplete Quotes</p>
             <p>0</p>
           </div>
-          <button className={styles.missingButton}>Missing Policy Number</button>
+          <button className={styles.missingButton}>
+            Missing Policy Number
+          </button>
         </div>
         <div className={styles.statBox}>
-          <div className={styles.icon}><img src="/premium.png" alt="Premium Icon" /></div>
+          <div className={styles.icon}>
+            <img src="/premium.png" alt="Premium Icon" />
+          </div>
           <div className={styles.statInfo}>
             <p>Unsold Premium</p>
             <p>$0.00</p>
@@ -51,7 +60,9 @@ const DashboardForm: React.FC = () => {
           <button className={styles.paymentButton}>Payment Due</button>
         </div>
         <div className={styles.statBox}>
-          <div className={styles.icon}><img src="/ticket.png" alt="Sold Icon" /></div>
+          <div className={styles.icon}>
+            <img src="/ticket.png" alt="Sold Icon" />
+          </div>
           <div className={styles.statInfo}>
             <p>Total premium sold</p>
             <p>$0.00</p>
@@ -90,24 +101,36 @@ const DashboardForm: React.FC = () => {
               <td>13643 St A 5Star CRC</td>
               <td>Jul 25, 2024</td>
               <td>$12,300.00</td>
-              <td><span className={styles.statusActive}>Active</span></td>
-              <td><button className={styles.moreButton}>...</button></td>
+              <td>
+                <span className={styles.statusActive}>Active</span>
+              </td>
+              <td>
+                <button className={styles.moreButton}>...</button>
+              </td>
             </tr>
             <tr>
               <td>Elaine Thakur</td>
               <td>American Empire Insurance Company Amwins Brokerage...</td>
               <td>Jul 25, 2024</td>
               <td>$106,970.60</td>
-              <td><span className={styles.statusActive}>Active</span></td>
-              <td><button className={styles.moreButton}>...</button></td>
+              <td>
+                <span className={styles.statusActive}>Active</span>
+              </td>
+              <td>
+                <button className={styles.moreButton}>...</button>
+              </td>
             </tr>
             <tr>
               <td>Elaine Thakur</td>
               <td>American Empire Insurance Company Amwins Brokerage...</td>
               <td>Jul 25, 2024</td>
               <td>$106,970.60</td>
-              <td><span className={styles.statusActive}>Active</span></td>
-              <td><button className={styles.moreButton}>...</button></td>
+              <td>
+                <span className={styles.statusActive}>Active</span>
+              </td>
+              <td>
+                <button className={styles.moreButton}>...</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -128,4 +151,3 @@ const DashboardForm: React.FC = () => {
 };
 
 export default DashboardForm;
-

@@ -18,7 +18,7 @@ const Profile = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    phoneNumber: ""
+    phoneNumber: "",
   });
   const router = useRouter();
 

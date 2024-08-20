@@ -30,31 +30,67 @@ api.interceptors.response.use(
   }
 );
 
-export const signUp = async (userData: {
-  companyName: string;
-  mobileNumber: string;
-  website?: string;
-  streetAddress: string;
-  streetAddress2?: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber: string;
-}) => {
-  console.log("signup is");
-  return await api.post("/user/signup", userData);
-};
+export const signUp = async (formData: any) => {
+  const {
+    companyName,
+    mobileNumber,
+    website,
+    streetAddress,
+    streetAddress2,
+    city,
+    state,
+    zipCode,
+    firstName,
+    lastName,
+    email,
+    password,
+    phoneNumber,
+    confirmPassword,
+  } = formData;
 
-export const agreement = async (userData: {
-  
-}) => {
-  
-}
+  let companyId = null;
+  // Step 1: Register the company
+  try {
+    // Step 1: Register the company
+    const companyResponse = await api.post("/companies/register", {
+      companyName,
+      mobileNumber,
+      website,
+      streetAddress,
+      streetAddress2,
+      city,
+      state,
+      zipCode,
+      adminEmail: email,
+    });
+
+    companyId = companyResponse.data._id;
+
+    // Step 2: Register the user with the returned companyId
+    const userResponse = await api.post("/user/signup", {
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumber,
+      confirmPassword,
+      companyId,
+    });
+
+    return userResponse;
+  } catch (error) {
+    console.error("Error during registration:", error);
+
+    // If user registration fails, delete the company to roll back
+    if (companyId) {
+      await api.delete(`/companies/${companyId}`);
+      console.log(`Rolled back company creation with ID: ${companyId}`);
+    }
+
+    // Rethrow the error to be handled by the caller
+    throw error;
+  }
+};
 
 export const newUser = async (userData: {
   firstName: string;
@@ -63,9 +99,9 @@ export const newUser = async (userData: {
   phoneNumber: string;
   role: string;
 }) => {
-  console.log("newUser Signup is "+ userData.firstName);
+  console.log("newUser Signup is " + userData.firstName);
   return await api.post("/user/newUser", userData);
-};  
+};
 
 export const login = async (credentials: {
   email: string;
@@ -101,11 +137,16 @@ export const getProfile = async (token: any) => {
   });
 };
 
+export const getCompanyDetails = async (companyId: string) => {
+  console.log("CompanyId" + companyId);
+  return await api.get(`/companies/${companyId}`);
+};
+
 export const getSingleProfile = async (email: any) => {
   console.log("helloEMAILLL " + email);
   const response = await api.get(`/user/${email}`);
   console.log("Customer details: ", response);
-  return response.data
+  return response.data;
 };
 
 export const updateProfile = async (
@@ -127,7 +168,7 @@ export const updateProfile = async (
   },
   token?: any
 ) => {
-  console.log("ITSSSSS USER DATTATATA",userData);
+  console.log("ITSSSSS USER DATTATATA", userData);
   return await api.put("/user/profile", userData);
 };
 
@@ -147,7 +188,7 @@ export const getUsers = async (token: string) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data)
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching users:");
@@ -171,5 +212,3 @@ export const fetchCustomerDetails = async (email: string) => {
   console.log(response + "hello");
   return response.data;
 };
-
-

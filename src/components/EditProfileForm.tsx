@@ -16,7 +16,7 @@ const EditProfile = () => {
     firstName: "",
     lastName: "",
     email: "",
-    phoneNumber: ""
+    phoneNumber: "",
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +31,7 @@ const EditProfile = () => {
         const response = await getProfile(token as string);
         console.log("2" + response.data);
         const formattedData = {
-          ...response.data
+          ...response.data,
         };
         console.log("yeah profile fetched");
         setFormData(formattedData);

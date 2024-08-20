@@ -1,10 +1,10 @@
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 const VerifiedPage: React.FC = () => {
   const router = useRouter();
 
   const handleLoginRedirect = () => {
-    router.push('/login');
+    router.push("/login");
   };
 
   return (

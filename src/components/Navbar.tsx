@@ -13,15 +13,15 @@ import {
   faArrowAltCircleLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
-import { getProfile } from "@/services/api";
+import { getCompanyDetails, getProfile } from "@/services/api";
 
 const Navbar: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, companyDetails } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [companyName, setCompanyName] = useState("NULL");
+  // const [companyName, setCompanyName] = useState("");
   const hideNavbarRoutes = ["/otp", "/login", "/register"];
   const hideNavbar = hideNavbarRoutes.includes(router.pathname);
 
@@ -29,23 +29,24 @@ const Navbar: React.FC = () => {
     setModalOpen(true);
   };
 
-  useEffect(() => {
-    const getCompanyName = async () => {
-      if (typeof window !== "undefined") {
-        const token = localStorage.getItem("token");
-        if (token) {
-          try {
-            const data = await getProfile(token as string);
-            console.log(data.data.companyName);
-            setCompanyName(data.data.companyName);
-          } catch (error) {
-            console.log("Error fetching company name", error);
-          }
-        }
-      }
-    };
-    getCompanyName();
-  }, []);
+  // useEffect(() => {
+  //   const getCompanyName = async () => {
+  //     if (typeof window !== "undefined") {
+  //       const token = localStorage.getItem("token");
+  //       if (token) {
+  //         try {
+  //           const data = await getProfile(token as string);
+  //           console.log(data.data.companyId);
+  //           const companyDetails = await getCompanyDetails(data.data.companyId)
+  //           setCompanyName(companyDetails.data.companyName);
+  //         } catch (error) {
+  //           console.log("Error fetching company name", error);
+  //         }
+  //       }
+  //     }
+  //   };
+  //   getCompanyName();
+  // }, []);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -121,7 +122,9 @@ const Navbar: React.FC = () => {
               className={styles.brand}
               onClick={() => router.push("/dashboard")}
             >
-              <p style={{ color: "white", cursor: "pointer" }}>{companyName}</p>
+              <p style={{ color: "white", cursor: "pointer" }}>
+                {companyDetails?.companyName}
+              </p>
             </div>
             <div className={styles.profileIcons}>
               <div className={styles.settingsIcon}>

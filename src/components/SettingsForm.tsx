@@ -2,7 +2,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
-import { getProfile, getSingleProfile, getUsers, updateProfile } from "@/services/api";
+import {
+  getProfile,
+  getSingleProfile,
+  getUsers,
+  updateProfile,
+} from "@/services/api";
 import { useRouter } from "next/router";
 import {
   Card,
@@ -22,6 +27,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import { styled } from "@mui/material/styles";
 import styles from "../styles/Settings.module.css";
+import { useAuth } from "@/context/AuthContext";
 
 interface User {
   firstName: string;
@@ -29,6 +35,7 @@ interface User {
   email: string;
   phoneNumber: string;
   role: string;
+  companyId: string;
 }
 
 const StyledCard = styled(Card)({
@@ -64,6 +71,7 @@ const FieldWithValue: React.FC<FieldWithValueProps> = ({ label, value }) => (
 
 const SettingsForm = () => {
   const [activeTab, setActiveTab] = useState("userManagement");
+  const { companyDetails } = useAuth();
   const [profile, setProfile] = useState({
     firstName: "",
     lastName: "",
@@ -118,12 +126,14 @@ const SettingsForm = () => {
   };
 
   const filteredUsers = users.filter(
-    (user) =>
+    (user) => user.companyId === companyDetails?._id &&
+    (
       user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.phoneNumber.includes(searchQuery) ||
       user.role.includes(searchQuery)
+    )
   );
 
   const handleOpenEditOrgDialog = () => {
@@ -166,14 +176,14 @@ const SettingsForm = () => {
   const handleSaveProfile = async () => {
     const updatedProfileResponse = await updateProfile(profileToEdit); // Axios response
     const updatedProfileData = updatedProfileResponse.data; // Extract the data
-    setUsers((prevUsers) => 
+    setUsers((prevUsers) =>
       prevUsers.map((user) =>
         user.email === updatedProfileData.email ? updatedProfileData : user
       )
     );
-    alert('Profile updated successfully!');
+    alert("Profile updated successfully!");
     handleCloseEditProfileDialog();
-  }
+  };
 
   return (
     <div className={styles.settingsContainer}>
@@ -259,7 +269,7 @@ const SettingsForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {role === "admin" &&
+                {role === "admin" && 
                   filteredUsers.map((user, index) => (
                     <tr key={index}>
                       <td>{user.firstName}</td>
@@ -270,7 +280,9 @@ const SettingsForm = () => {
                       <td>
                         <button
                           className={styles.editButton}
-                          onClick={()=> handleOpenEditProfileDialog(user.email)}
+                          onClick={() =>
+                            handleOpenEditProfileDialog(user.email)
+                          }
                         >
                           ✏️
                         </button>
@@ -288,7 +300,9 @@ const SettingsForm = () => {
                     <td>
                       <button
                         className={styles.editButton}
-                        onClick={()=> handleOpenEditProfileDialog(profile.email)}
+                        onClick={() =>
+                          handleOpenEditProfileDialog(profile.email)
+                        }
                       >
                         ✏️
                       </button>

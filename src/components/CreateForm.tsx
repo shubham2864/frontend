@@ -23,7 +23,7 @@ import {
 import { Add, Delete } from "@mui/icons-material";
 import styles from "../styles/CreatePage.module.css"; // Import the CSS module
 import Link from "next/link";
-import { agreement, fetchCustomerDetails } from "../services/api"; // Adjust import path as necessary
+import { fetchCustomerDetails } from "../services/api"; // Adjust import path as necessary
 import { useRouter } from "next/router";
 import axios from "axios";
 
