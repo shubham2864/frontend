@@ -17,35 +17,31 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import styles from "../styles/Settings.module.css";
+import { useAuth } from "@/context/AuthContext";
 
 const UserForm = () => {
   const router = useRouter();
   const { id } = router.query;
+  const { companyDetails } = useAuth();
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phoneNumber: "",
+    password: "",
+    confirmPassword: "",
     organization: "",
     role: "",
+    companyId: companyDetails?._id || "",
   });
 
-  const [companyName, setCompanyName] = useState("");
-
-  const getCompanyName = async () => {
-    const token = localStorage.getItem("token");
-    const data = await getProfile(token);
-    setCompanyName(data.data.companyName);
-  };
-
-  getCompanyName();
-
   useEffect(() => {
+    const token = localStorage.getItem("token");
     if (id && id !== "new") {
-      const token = localStorage.getItem("token");
       getProfile(token)
         .then((response) => {
           setUser(response.data);
+          console.log(response.data + " ITS THE RESPONSE DATAAA!!@#");
         })
         .catch((error) => {
           console.error(error);
@@ -74,17 +70,19 @@ const UserForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (user.password !== user.confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
-      if (id && id !== "new") {
-        // await updateProfile(user, token);
-      } else {
-        try {
-          await newUser(user);
-        } catch (error) {
-          console.log(error);
-          alert("User Already Exists");
-        }
+      try {
+        await newUser(user);
+      } catch (error) {
+        console.log(error);
+        alert("User Already Exists " + error);
       }
       router.push("/settings");
     } catch (error) {
@@ -152,11 +150,29 @@ const UserForm = () => {
             onChange={handleChange}
           />
           <TextField
+            name="password"
+            label="Password"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            value={user.password}
+            onChange={handleChange}
+          />
+          <TextField
+            name="confirmPassword"
+            label="Confirm Password"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            value={user.confirmPassword}
+            onChange={handleChange}
+          />
+          <TextField
             name="organization"
             label="Organization"
             fullWidth
             margin="normal"
-            value={companyName}
+            value={companyDetails?.companyName}
             InputProps={{ readOnly: true }}
           />
           <FormControl fullWidth margin="normal">

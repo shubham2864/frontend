@@ -97,10 +97,13 @@ export const newUser = async (userData: {
   lastName: string;
   email: string;
   phoneNumber: string;
+  password: string;
+  confirmPassword: string;
   role: string;
+  companyId: string;
 }) => {
   console.log("newUser Signup is " + userData.firstName);
-  return await api.post("/user/newUser", userData);
+  return await api.post("/user/signup", userData);
 };
 
 export const login = async (credentials: {
@@ -211,4 +214,24 @@ export const fetchCustomerDetails = async (email: string) => {
   const response = await api.get(`/user/${email}`);
   console.log(response + "hello");
   return response.data;
+};
+
+export const updateCompanyDetails = async (
+  orgDetails: {
+    companyName?: string;
+    mobileNumber?: string;
+    website?: string;
+    streetAddress?: string;
+    taxId?: string;
+    type?: string;
+  },
+  companyId: string
+) => {
+  try {
+    const response = await api.put(`/companies/${companyId}`, orgDetails);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating company details:", error);
+    throw error;
+  }
 };

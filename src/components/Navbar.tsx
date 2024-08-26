@@ -21,33 +21,13 @@ const Navbar: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  // const [companyName, setCompanyName] = useState("");
   const hideNavbarRoutes = ["/otp", "/login", "/register"];
   const hideNavbar = hideNavbarRoutes.includes(router.pathname);
 
   const handleCreateClick = () => {
     setModalOpen(true);
   };
-
-  // useEffect(() => {
-  //   const getCompanyName = async () => {
-  //     if (typeof window !== "undefined") {
-  //       const token = localStorage.getItem("token");
-  //       if (token) {
-  //         try {
-  //           const data = await getProfile(token as string);
-  //           console.log(data.data.companyId);
-  //           const companyDetails = await getCompanyDetails(data.data.companyId)
-  //           setCompanyName(companyDetails.data.companyName);
-  //         } catch (error) {
-  //           console.log("Error fetching company name", error);
-  //         }
-  //       }
-  //     }
-  //   };
-  //   getCompanyName();
-  // }, []);
-
+  
   const handleModalClose = () => {
     setModalOpen(false);
   };

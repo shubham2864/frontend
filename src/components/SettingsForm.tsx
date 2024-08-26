@@ -6,9 +6,11 @@ import {
   getProfile,
   getSingleProfile,
   getUsers,
+  updateCompanyDetails,
   updateProfile,
 } from "@/services/api";
 import { useRouter } from "next/router";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Card,
   CardContent,
@@ -21,13 +23,20 @@ import {
   DialogContent,
   DialogTitle,
   Typography,
-  Grid,
   Box,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Checkbox,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { styled } from "@mui/material/styles";
 import styles from "../styles/Settings.module.css";
 import { useAuth } from "@/context/AuthContext";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 
 interface User {
   firstName: string;
@@ -81,6 +90,26 @@ const SettingsForm = () => {
     phoneNumber: "",
     role: "",
   });
+  const [orgDetails, setOrgDetails] = useState({
+    businessName: "",
+    phone: "",
+    website: "",
+    address: "",
+    taxId: "",
+    type: "",
+  });
+  const [bankDetails, setBankDetails] = useState({
+    accountTypeOperational: "",
+    operationalAccountHolderName: "",
+    operationalAccountNumber: "",
+    operationalRoutingNumber: "",
+    accountTypeTrust: "",
+    trustAccountHolderName: "",
+    trustAccountNumber: "",
+    trustRoutingNumber: "",
+    sameAsOperational: false,
+    oneTimePaymentAccount: "",
+  });
   const [users, setUsers] = useState<User[]>([]);
   const [role, setRole] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -89,6 +118,12 @@ const SettingsForm = () => {
   const [editProfileDialogOpen, setEditProfileDialogOpen] = useState(false);
   const [verified, setVerified] = useState("Pending");
   const [profileToEdit, setProfileToEdit] = useState<Partial<User>>({});
+  const [sameAsOperational, setSameAsOperational] = useState(false);
+  const [accountTypeOperational, setAccountTypeOperational] =
+    useState("Company");
+  const [accountTypeTrust, setAccountTypeTrust] = useState("Company");
+  const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -108,10 +143,43 @@ const SettingsForm = () => {
           console.error("Error fetching profile or users:", error);
         }
       }
+      if (companyDetails) {
+        setOrgDetails((prevDetails) => ({
+          ...prevDetails,
+          businessName: companyDetails.companyName,
+          phone: companyDetails.mobileNumber,
+          website: companyDetails.website,
+          address: `${companyDetails.streetAddress}, ${companyDetails.city}, ${companyDetails.state}, ${companyDetails.zipCode}`,
+          taxId: `${companyDetails.taxId}`,
+          type: `${companyDetails.type}`,
+        }));
+      }
     };
 
     fetchProfileAndUsers();
-  }, []);
+  }, [companyDetails]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setOrgDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
+  const handleBankDetailsInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value, type, checked } = e.target;
+    setBankDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSameAsOperationalChange = (event: any) => {
+    setSameAsOperational(event.target.checked);
+  };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -126,15 +194,32 @@ const SettingsForm = () => {
   };
 
   const filteredUsers = users.filter(
-    (user) => user.companyId === companyDetails?._id &&
-    (
-      user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.phoneNumber.includes(searchQuery) ||
-      user.role.includes(searchQuery)
-    )
+    (user) =>
+      user.companyId === companyDetails?._id &&
+      (user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.phoneNumber.includes(searchQuery) ||
+        user.role.includes(searchQuery))
   );
+
+  const handleSaveOrgDetails = async () => {
+    try {
+      const updatedOrgDetails = {
+        companyName: orgDetails.businessName,
+        mobileNumber: orgDetails.phone,
+        website: orgDetails.website,
+        streetAddress: orgDetails.address,
+        taxId: orgDetails.taxId,
+        type: orgDetails.type,
+      };
+
+      await updateCompanyDetails(updatedOrgDetails, companyDetails!._id);
+      handleCloseEditOrgDialog();
+    } catch (error) {
+      console.error("Failed to save company details:", error);
+    }
+  };
 
   const handleOpenEditOrgDialog = () => {
     setEditOrgDialogOpen(true);
@@ -142,7 +227,6 @@ const SettingsForm = () => {
 
   const handleCloseEditOrgDialog = () => {
     setEditOrgDialogOpen(false);
-    setVerified("Verified");
   };
 
   const handleOpenEditBankDialog = () => {
@@ -183,6 +267,21 @@ const SettingsForm = () => {
     );
     alert("Profile updated successfully!");
     handleCloseEditProfileDialog();
+  };
+
+  const handleFileChange = (e: any) => {
+    const uploadedFile = e.target.files[0];
+    if (uploadedFile && uploadedFile.type === "application/pdf") {
+      setFileName(uploadedFile.name);
+      setFile(uploadedFile);
+    } else {
+      alert("Please upload a PDF file.");
+    }
+  };
+
+  const handleFileDelete = () => {
+    setFileName("");
+    setFile(null);
   };
 
   return (
@@ -269,7 +368,7 @@ const SettingsForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {role === "admin" && 
+                {role === "admin" &&
                   filteredUsers.map((user, index) => (
                     <tr key={index}>
                       <td>{user.firstName}</td>
@@ -313,6 +412,8 @@ const SettingsForm = () => {
             </table>
           </div>
         )}
+
+        {/* Organization Details  */}
         {activeTab === "organizationDetails" && (
           <div style={{ width: "100%", maxWidth: "1500px", margin: "0 auto" }}>
             <div
@@ -349,6 +450,8 @@ const SettingsForm = () => {
             >
               Business and bank details should go where you have Test Insurance
             </p>
+
+            {/* Business Details Card */}
             <StyledCard
               sx={{
                 margin: "0 auto",
@@ -361,7 +464,7 @@ const SettingsForm = () => {
               }}
             >
               <CardHeader
-                title="LIC Insurance"
+                title={companyDetails?.companyName}
                 action={
                   <IconButton onClick={handleOpenEditOrgDialog}>
                     <EditIcon />
@@ -369,83 +472,498 @@ const SettingsForm = () => {
                 }
               />
               <CardContent>
-                <FieldWithValue
-                  label="Doing business as"
-                  value="ABC Insurance"
-                />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
+                <div className={styles.fieldWithValueContainer}>
+                  <span className={styles.fieldLabel}>Doing business as</span>
+                  <span className={styles.separator}> - </span>
+                  <span className={styles.fieldValue}>
+                    {orgDetails.businessName}
+                  </span>
+                </div>
+                <div className={styles.fieldWithValueContainer}>
+                  <span className={styles.fieldLabel}>Phone</span>
+                  <span className={styles.separator}> - </span>
+                  <span className={styles.fieldValue}>{orgDetails.phone}</span>
+                </div>
+                <div className={styles.fieldWithValueContainer}>
+                  <span className={styles.fieldLabel}>Website</span>
+                  <span className={styles.separator}> - </span>
+                  <span className={styles.fieldValue}>
+                    {orgDetails.website}
+                  </span>
+                </div>
+                <div className={styles.fieldWithValueContainer}>
+                  <span className={styles.fieldLabel}>Address</span>
+                  <span className={styles.separator}> - </span>
+                  <span className={styles.fieldValue}>
+                    {orgDetails.address}
+                  </span>
+                </div>
+                <div className={styles.fieldWithValueContainer}>
+                  <span className={styles.fieldLabel}>
+                    Tax identification number
+                  </span>
+                  <span className={styles.separator}> - </span>
+                  <span className={styles.fieldValue}>{orgDetails.taxId}</span>
+                </div>
+                <div className={styles.fieldWithValueContainer}>
+                  <span className={styles.fieldLabel}>Type</span>
+                  <span className={styles.separator}> - </span>
+                  <span className={styles.fieldValue}>{orgDetails.type}</span>
+                </div>
+              </CardContent>
+            </StyledCard>
 
-                <FieldWithValue label="Phone Number" value="+91 123456789" />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-                <FieldWithValue label="Website" value="www.google.com" />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-                <FieldWithValue label="Address" value="Sainath colony" />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-                <FieldWithValue
-                  label="Tax identification number"
-                  value="0000000000"
-                />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-                <FieldWithValue label="Type" value="llc" />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-              </CardContent>
-              <CardHeader
-                title="Bank Details"
-                action={
-                  <IconButton onClick={handleOpenEditBankDialog}>
-                    <EditIcon />
-                  </IconButton>
-                }
-              />
-              <CardContent>
-                <FieldWithValue label="Account Holder Name" value="shubham" />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-                <FieldWithValue label="Account Number" value="123456789" />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-                <FieldWithValue label="Phone Number" value="+91 123456789" />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-                <FieldWithValue label="Routing Number" value="+91 123456789" />
-                <div style={{ borderBottom: "1px dotted #000" }}></div>
-              </CardContent>
+            {/* Bank Details Card */}
+            <StyledCard
+              sx={{
+                margin: "0 auto",
+                marginTop: "30px",
+                width: "100%", // Use percentage width
+                maxWidth: "1500px", // Limit the maximum width
+                height: "fit-content", // Adjust the height
+                marginBottom: "10px",
+                boxShadow: 3, // Optional: Add shadow
+                borderRadius: "8px",
+              }}
+            >
+              <Box display="flex" alignItems="right" justifyContent="end">
+                <IconButton
+                  onClick={handleOpenEditBankDialog}
+                  style={{ marginLeft: "auto", justifyContent: "flex-end" }} // Push the button to the right end
+                >
+                  <EditIcon />
+                </IconButton>
+              </Box>
+              <DialogContent>
+                <FormControl component="fieldset" margin="normal" fullWidth>
+                  <FormLabel
+                    component="legend"
+                    style={{
+                      color: "black",
+                      fontSize: "25px",
+                      display: "flex", // Use flexbox to position items
+                      alignItems: "center", // Center items vertically
+                    }}
+                  >
+                    Bank Details
+                  </FormLabel>
+                </FormControl>
+
+                <FormControl component="fieldset" margin="normal" fullWidth>
+                  <FormLabel
+                    component="legend"
+                    style={{ color: "black", fontSize: "18px" }}
+                  >
+                    Operational account
+                  </FormLabel>
+                  <CardContent>
+                    <div className={styles.fieldWithValueContainer}>
+                      <span className={styles.fieldLabel}>
+                        Account Holder Name
+                      </span>
+                      <span className={styles.separator}> - </span>
+                      <span className={styles.fieldValue}>{bankDetails.operationalAccountHolderName}</span>
+                    </div>
+                    <div className={styles.fieldWithValueContainer}>
+                      <span className={styles.fieldLabel}>Account Number</span>
+                      <span className={styles.separator}> - </span>
+                      <span className={styles.fieldValue}>{bankDetails.operationalAccountNumber}</span>
+                    </div>
+                    <div className={styles.fieldWithValueContainer}>
+                      <span className={styles.fieldLabel}>Routing Number</span>
+                      <span className={styles.separator}> - </span>
+                      <span className={styles.fieldValue}>{bankDetails.operationalRoutingNumber}</span>
+                    </div>
+                  </CardContent>
+                </FormControl>
+
+                <Typography
+                  variant="h6"
+                  style={{ marginTop: "20px", fontSize: "18px" }}
+                >
+                  Trust account
+                  <CardContent>
+                    <div className={styles.fieldWithValueContainer}>
+                      <span className={styles.fieldLabel}>
+                        Account Holder Name
+                      </span>
+                      <span className={styles.separator}> - </span>
+                      <span className={styles.fieldValue}>{bankDetails.trustAccountHolderName}</span>
+                    </div>
+                    <div className={styles.fieldWithValueContainer}>
+                      <span className={styles.fieldLabel}>Account Number</span>
+                      <span className={styles.separator}> - </span>
+                      <span className={styles.fieldValue}>{bankDetails.trustAccountNumber}</span>
+                    </div>
+                    <div className={styles.fieldWithValueContainer}>
+                      <span className={styles.fieldLabel}>Routing Number</span>
+                      <span className={styles.separator}> - </span>
+                      <span className={styles.fieldValue}>{bankDetails.trustRoutingNumber}</span>
+                    </div>
+                  </CardContent>
+                </Typography>
+
+                <FormControl component="fieldset" margin="normal" fullWidth>
+                  <FormLabel
+                    component="legend"
+                    style={{ color: "black", fontSize: "18px" }}
+                  >
+                    One-time payment account
+                  </FormLabel>
+                  <Typography variant="body2" style={{ marginBottom: "10px" }}>
+                    The account where Link finance will transfer all funds
+                    received for one-time payments.
+                  </Typography>
+                  <CardContent>
+                    <div className={styles.fieldWithValueContainer}>
+                      <span className={styles.fieldLabel}>Account</span>
+                      <span className={styles.separator}> - </span>
+                      <span className={styles.fieldValue}></span>
+                    </div>
+                  </CardContent>
+                </FormControl>
+
+                <Typography
+                  variant="h6"
+                  style={{ marginTop: "20px", fontSize: "18px" }}
+                >
+                  Proof of bank account
+                </Typography>
+                <Typography variant="body2" style={{ marginBottom: "10px" }}>
+                  Can you please provide a legal document (e.g., SS-4
+                  confirmation letter, Letter 147C) that provides confirmation
+                  of the entity's legal name and TIN? We will need this document
+                  in order for you to transact with Link-Finance.
+                </Typography>
+                <Box
+                  sx={{ width: "100%", maxWidth: "800px", margin: "0 auto" }}
+                >
+                  {fileName && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                        padding: "10px",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        backgroundColor: "#f9f9f9",
+                      }}
+                    >
+                      <Typography variant="body1">{fileName}</Typography>
+                      <IconButton onClick={handleFileDelete} color="error">
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  )}
+
+                  <Box
+                    component="label"
+                    sx={{
+                      width: "100%",
+                      display: "block",
+                      padding: "20px",
+                      border: "2px dashed #ccc",
+                      borderRadius: "4px",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      backgroundColor: "#f7f7f7",
+                      ":hover": {
+                        borderColor: "#888",
+                      },
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                    <UploadFileIcon fontSize="large" color="action" />
+                    <Typography variant="body1" color="textSecondary">
+                      Drop or Select file
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      Drop files here or click <strong>browse</strong> through
+                      your machine
+                    </Typography>
+                  </Box>
+                </Box>
+              </DialogContent>
             </StyledCard>
           </div>
         )}
       </div>
+
+      {/* Organization Details dialog Box */}
       <Dialog open={editOrgDialogOpen} onClose={handleCloseEditOrgDialog}>
         <DialogTitle>Edit Organization Details</DialogTitle>
         <DialogContent>
-          <TextField label="Business Name" fullWidth margin="normal" />
-          <TextField label="Phone" fullWidth margin="normal" />
-          <TextField label="Website" fullWidth margin="normal" />
-          <TextField label="Address" fullWidth margin="normal" />
-          <TextField label="Tax ID" fullWidth margin="normal" />
-          <TextField label="Type" fullWidth margin="normal" />
+          <TextField
+            type="text"
+            label="Business Name"
+            fullWidth
+            margin="normal"
+            name="businessName"
+            value={orgDetails.businessName}
+            onChange={handleInputChange}
+          />
+          <TextField
+            type="text"
+            label="Phone"
+            fullWidth
+            margin="normal"
+            name="phone"
+            value={orgDetails.phone}
+            onChange={handleInputChange}
+          />
+          <TextField
+            type="text"
+            label="Website"
+            fullWidth
+            margin="normal"
+            name="website"
+            value={orgDetails.website}
+            onChange={handleInputChange}
+          />
+          <TextField
+            type="text"
+            label="Address"
+            fullWidth
+            margin="normal"
+            name="address"
+            value={orgDetails.address}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            label="Tax Identification Number"
+            type="text"
+            fullWidth
+            name="taxId"
+            value={orgDetails.taxId}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            label="Type"
+            type="text"
+            fullWidth
+            name="type"
+            value={orgDetails.type}
+            onChange={handleInputChange}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditOrgDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleCloseEditOrgDialog} color="primary">
+          <Button onClick={handleSaveOrgDetails} color="primary">
             Save
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={editBankDialogOpen} onClose={handleCloseEditProfileDialog}>
-        <DialogTitle>Edit Bank Details</DialogTitle>
+      {/* Bank details Modal */}
+      <Dialog
+        open={editBankDialogOpen}
+        onClose={handleCloseEditBankDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <Box display="flex" alignItems="right" justifyContent="end">
+          <IconButton onClick={handleCloseEditBankDialog}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
         <DialogContent>
-          <TextField label="Bank Name" fullWidth margin="normal" />
-          <TextField label="Account Number" fullWidth margin="normal" />
-          <TextField label="Routing Number" fullWidth margin="normal" />
-          <TextField label="Bank Address" fullWidth margin="normal" />
-          <TextField label="SWIFT Code" fullWidth margin="normal" />
+          <FormControl component="fieldset" margin="normal" fullWidth>
+            <FormLabel
+              component="legend"
+              style={{ color: "black", fontSize: "25px" }}
+            >
+              Bank Details
+            </FormLabel>
+            <Typography variant="body2" style={{ marginBottom: "10px" }}>
+              In order for us to pay your agency, we’ll need to collect your
+              bank details. Please fill in the form below.
+            </Typography>
+          </FormControl>
+
+          <FormControl component="fieldset" margin="normal" fullWidth>
+            <FormLabel
+              component="legend"
+              style={{ color: "black", fontSize: "18px" }}
+            >
+              Operational account
+            </FormLabel>
+            <Typography variant="body2" style={{ marginBottom: "10px" }}>
+              The account you use to manage your agency's operational expenses.
+              Link-finance will send you your commission to this account.
+            </Typography>
+            <RadioGroup
+              value={bankDetails.accountTypeOperational}
+              onChange={handleBankDetailsInputChange}
+              name="accountTypeOperational"
+              row={false}
+            >
+              <FormControlLabel
+                value="Company"
+                control={<Radio />}
+                label="Company"
+              />
+              <FormControlLabel
+                value="Individual"
+                control={<Radio />}
+                label="Individual"
+              />
+            </RadioGroup>
+            <TextField
+              label="Account holder name"
+              fullWidth
+              margin="normal"
+              name="operationalAccountHolderName"
+              value={bankDetails.operationalAccountHolderName}
+              onChange={handleBankDetailsInputChange}
+            />
+            <TextField
+              label="Account number"
+              fullWidth
+              margin="normal"
+              name="operationalAccountNumber"
+              value={bankDetails.operationalAccountNumber}
+              onChange={handleBankDetailsInputChange}
+            />
+            <TextField
+              label="Routing number"
+              fullWidth
+              margin="normal"
+              name="operationalRoutingNumber"
+              value={bankDetails.operationalRoutingNumber}
+              onChange={handleBankDetailsInputChange}
+            />
+          </FormControl>
+
+          <Typography
+            variant="h6"
+            style={{ marginTop: "20px", fontSize: "18px" }}
+          >
+            Trust account
+          </Typography>
+          <Typography variant="body2">
+            The account you use to hold funds on behalf of other partners (e.g.,
+            carriers, wholesalers, etc). For customers on the Starter plan,
+            Link-finance will transfer all funds (premium and commission) for
+            paid-in-full policies to this account.
+          </Typography>
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={sameAsOperational}
+                onChange={handleSameAsOperationalChange}
+              />
+            }
+            label="Same as operational account"
+            style={{ marginTop: "10px" }}
+          />
+
+          {!sameAsOperational && (
+            <FormControl component="fieldset" margin="normal" fullWidth>
+              <RadioGroup
+                value={bankDetails.accountTypeTrust}
+                onChange={handleBankDetailsInputChange}
+                name="accountTypeTrust"
+                row={false}
+              >
+                <FormControlLabel
+                  value="Company"
+                  control={<Radio />}
+                  label="Company"
+                />
+                <FormControlLabel
+                  value="Individual"
+                  control={<Radio />}
+                  label="Individual"
+                />
+              </RadioGroup>
+              <TextField
+                label="Account holder name"
+                fullWidth
+                margin="normal"
+                name="trustAccountHolderName"
+                value={bankDetails.trustAccountHolderName}
+                onChange={handleBankDetailsInputChange}
+              />
+              <TextField
+                label="Account number"
+                fullWidth
+                margin="normal"
+                name="trustAccountNumber"
+                value={bankDetails.trustAccountNumber}
+                onChange={handleBankDetailsInputChange}
+              />
+              <TextField
+                label="Routing number"
+                fullWidth
+                margin="normal"
+                name="trustRoutingNumber"
+                value={bankDetails.trustRoutingNumber}
+                onChange={handleBankDetailsInputChange}
+              />
+            </FormControl>
+          )}
+
+          <FormControl component="fieldset" margin="normal" fullWidth>
+            <FormLabel
+              component="legend"
+              style={{ color: "black", fontSize: "18px" }}
+            >
+              One-time payment account
+            </FormLabel>
+            <Typography variant="body2" style={{ marginBottom: "10px" }}>
+              The account where Link-finance will transfer all funds received
+              for one-time payments.
+            </Typography>
+            <RadioGroup
+              value={accountTypeOperational}
+              onChange={(e) => setAccountTypeOperational(e.target.value)}
+              row={false}
+            >
+              <FormControlLabel
+                value="operationalAccount"
+                control={<Radio />}
+                label="Operational Account"
+              />
+              <FormControlLabel
+                value="trustAccount"
+                control={<Radio />}
+                label="Trust Account"
+              />
+            </RadioGroup>
+          </FormControl>
         </DialogContent>
+
         <DialogActions>
-          <Button onClick={handleCloseEditBankDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleCloseEditBankDialog} color="primary">
-            Save
+          <Button
+            onClick={handleCloseEditBankDialog}
+            color="primary"
+            sx={{
+              marginRight: "20px",
+              bgcolor: "primary.main", // Background color
+              color: "#fff", // Text color
+              borderRadius: "8px", // Border radius
+              border: "1px solid", // Border
+              borderColor: "primary.dark", // Border color
+              padding: "8px 16px", // Padding
+              "&:hover": {
+                bgcolor: "primary.dark", // Hover effect for background color
+              },
+            }}
+          >
+            Save Bank Details
           </Button>
         </DialogActions>
       </Dialog>

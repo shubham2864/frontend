@@ -20,6 +20,9 @@ interface Company {
   city: string;
   state: string;
   zipCode: string;
+  website: string;
+  taxId: string;
+  type: string;
 }
 
 interface AuthContextType {
@@ -55,7 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(true);
 
       if (otpVerified === "true") {
-        compDetails(); 
+        compDetails();
         if (currentPath === "/otp" || currentPath === "/login") {
           router.push("/dashboard");
         }
@@ -68,9 +71,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setAuthChecked(true);
   }, []);
 
-  const login = (email: string) => {
+  const login = async (email: string) => {
     setUser({ email });
     localStorage.setItem("email", email);
+
+    // Trigger company details fetch after login
+    await compDetails();
   };
 
   const authenticate = () => {
