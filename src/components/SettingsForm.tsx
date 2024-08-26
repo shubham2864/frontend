@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import {
+  getBankDetails,
   getProfile,
   getSingleProfile,
   getUsers,
+  registerBankDetails,
   updateCompanyDetails,
   updateProfile,
 } from "@/services/api";
@@ -30,6 +32,15 @@ import {
   FormControlLabel,
   Radio,
   Checkbox,
+  Paper,
+  Tabs,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Tab,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { styled } from "@mui/material/styles";
@@ -119,11 +130,12 @@ const SettingsForm = () => {
   const [verified, setVerified] = useState("Pending");
   const [profileToEdit, setProfileToEdit] = useState<Partial<User>>({});
   const [sameAsOperational, setSameAsOperational] = useState(false);
-  const [accountTypeOperational, setAccountTypeOperational] =
-    useState("Company");
-  const [accountTypeTrust, setAccountTypeTrust] = useState("Company");
   const [fileName, setFileName] = useState("");
+  const [themeFileName, setThemeFileName] = useState("");
   const [file, setFile] = useState(null);
+  const [themeFile, setThemeFile] = useState(null);
+  const [isEditingColor, setIsEditingColor] = useState(false);
+  const [colorValue, setColorValue] = useState("#000");
   const router = useRouter();
 
   useEffect(() => {
@@ -143,6 +155,7 @@ const SettingsForm = () => {
           console.error("Error fetching profile or users:", error);
         }
       }
+
       if (companyDetails) {
         setOrgDetails((prevDetails) => ({
           ...prevDetails,
@@ -156,6 +169,20 @@ const SettingsForm = () => {
       }
     };
 
+    const fetchBankDetails = async () => {
+      if (companyDetails && companyDetails._id) {
+        try {
+          const data = await getBankDetails(companyDetails._id);
+          if (data && data.length > 0) {
+            setBankDetails(data[0]); // Set the first object in the array to bankDetails
+          }
+        } catch (error) {
+          console.error("Error fetching bank details:", error);
+        }
+      }
+    };
+
+    fetchBankDetails();
     fetchProfileAndUsers();
   }, [companyDetails]);
 
@@ -183,6 +210,17 @@ const SettingsForm = () => {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  const [wholeSalerTab, setWholeSalerTab] = useState(0);
+  const [themeTab, setThemeTab] = useState(0);
+
+  const handleWholeSalerTabChange = (event: any, newValue: any) => {
+    setWholeSalerTab(newValue);
+  };
+
+  const handleThemeTab = (event: any, newValue: any) => {
+    setThemeTab(newValue);
   };
 
   const handleOpen = () => {
@@ -218,6 +256,15 @@ const SettingsForm = () => {
       handleCloseEditOrgDialog();
     } catch (error) {
       console.error("Failed to save company details:", error);
+    }
+  };
+
+  const handleSaveBankDetails = async () => {
+    try {
+      await registerBankDetails(bankDetails, companyDetails!._id);
+      handleCloseEditBankDialog();
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -279,9 +326,32 @@ const SettingsForm = () => {
     }
   };
 
+  const handleThemeFileChange = (e: any) => {
+    const uploadedFile = e.target.files[0];
+    if (uploadedFile && uploadedFile.type === "application/pdf") {
+      setThemeFileName(uploadedFile.name);
+      setThemeFile(uploadedFile);
+    } else {
+      alert("Please upload a PDF file.");
+    }
+  };
+
   const handleFileDelete = () => {
     setFileName("");
     setFile(null);
+  };
+
+  const handleThemeFileDelete = () => {
+    setThemeFileName("");
+    setThemeFile(null);
+  };
+
+  const handleEditColorClick = () => {
+    setIsEditingColor(!isEditingColor);
+  };
+
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setColorValue(event.target.value);
   };
 
   return (
@@ -510,6 +580,10 @@ const SettingsForm = () => {
                   <span className={styles.separator}> - </span>
                   <span className={styles.fieldValue}>{orgDetails.type}</span>
                 </div>
+                <Typography variant="body1" sx={{ mb: 4 }}>
+                  Customers can use this portal to stay on top of their
+                  payments.
+                </Typography>
               </CardContent>
             </StyledCard>
 
@@ -562,17 +636,23 @@ const SettingsForm = () => {
                         Account Holder Name
                       </span>
                       <span className={styles.separator}> - </span>
-                      <span className={styles.fieldValue}>{bankDetails.operationalAccountHolderName}</span>
+                      <span className={styles.fieldValue}>
+                        {bankDetails.operationalAccountHolderName}
+                      </span>
                     </div>
                     <div className={styles.fieldWithValueContainer}>
                       <span className={styles.fieldLabel}>Account Number</span>
                       <span className={styles.separator}> - </span>
-                      <span className={styles.fieldValue}>{bankDetails.operationalAccountNumber}</span>
+                      <span className={styles.fieldValue}>
+                        {bankDetails.operationalAccountNumber}
+                      </span>
                     </div>
                     <div className={styles.fieldWithValueContainer}>
                       <span className={styles.fieldLabel}>Routing Number</span>
                       <span className={styles.separator}> - </span>
-                      <span className={styles.fieldValue}>{bankDetails.operationalRoutingNumber}</span>
+                      <span className={styles.fieldValue}>
+                        {bankDetails.operationalRoutingNumber}
+                      </span>
                     </div>
                   </CardContent>
                 </FormControl>
@@ -588,17 +668,23 @@ const SettingsForm = () => {
                         Account Holder Name
                       </span>
                       <span className={styles.separator}> - </span>
-                      <span className={styles.fieldValue}>{bankDetails.trustAccountHolderName}</span>
+                      <span className={styles.fieldValue}>
+                        {bankDetails.trustAccountHolderName}
+                      </span>
                     </div>
                     <div className={styles.fieldWithValueContainer}>
                       <span className={styles.fieldLabel}>Account Number</span>
                       <span className={styles.separator}> - </span>
-                      <span className={styles.fieldValue}>{bankDetails.trustAccountNumber}</span>
+                      <span className={styles.fieldValue}>
+                        {bankDetails.trustAccountNumber}
+                      </span>
                     </div>
                     <div className={styles.fieldWithValueContainer}>
                       <span className={styles.fieldLabel}>Routing Number</span>
                       <span className={styles.separator}> - </span>
-                      <span className={styles.fieldValue}>{bankDetails.trustRoutingNumber}</span>
+                      <span className={styles.fieldValue}>
+                        {bankDetails.trustRoutingNumber}
+                      </span>
                     </div>
                   </CardContent>
                 </Typography>
@@ -618,7 +704,9 @@ const SettingsForm = () => {
                     <div className={styles.fieldWithValueContainer}>
                       <span className={styles.fieldLabel}>Account</span>
                       <span className={styles.separator}> - </span>
-                      <span className={styles.fieldValue}></span>
+                      <span className={styles.fieldValue}>
+                        {bankDetails.oneTimePaymentAccount}
+                      </span>
                     </div>
                   </CardContent>
                 </FormControl>
@@ -692,6 +780,391 @@ const SettingsForm = () => {
                 </Box>
               </DialogContent>
             </StyledCard>
+          </div>
+        )}
+
+        {activeTab === "wholesalersCarriers" && (
+          <div>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 0,
+              }}
+            >
+              <Typography variant="h5">Wholesalers / Carriers</Typography>
+              <Button variant="contained" color="success">
+                Add New
+              </Button>
+            </Box>
+
+            <Typography variant="body1" sx={{ mb: 4 }}>
+              Add your agency’s wholesalers and carriers. This will ensure funds
+              go to the right place in a timely manner. We’ll also highlight
+              them whenever you’re creating a new agreement.
+            </Typography>
+
+            <Paper
+              elevation={3}
+              sx={{
+                mb: 2,
+                p: 3,
+                textAlign: "center",
+                backgroundColor: "#D3D3D3",
+                height: "30px",
+              }}
+            >
+              <Typography variant="body1" color="textSecondary">
+                Add your first wholesaler or a carrier.
+              </Typography>
+            </Paper>
+
+            <Paper elevation={3}>
+              <Tabs
+                value={wholeSalerTab}
+                onChange={handleWholeSalerTabChange}
+                indicatorColor="primary"
+                textColor="primary"
+              >
+                <Tab label="Wholesalers" />
+                <Tab label="Carriers" />
+              </Tabs>
+              <hr
+                style={{
+                  borderTop: "1px #ccc",
+                  marginTop: "0px",
+                  marginBottom: "0px",
+                }}
+              />
+              <TableContainer>
+                <Table>
+                  <TableHead className={styles.lightGrayHeader}>
+                    <TableRow>
+                      <TableCell>Name and Address</TableCell>
+                      <TableCell>Financing Status</TableCell>
+                      <TableCell>Commission</TableCell>
+                      <TableCell>Min Earned</TableCell>
+                      <TableCell>Default Payment Method</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {/* Add Table Rows Here */}
+                    <TableRow>
+                      <TableCell colSpan={5} align="center">
+                        No data available
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </div>
+        )}
+
+        {activeTab === "theme" && (
+          <div>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 0,
+              }}
+            >
+              <Typography variant="h5">Customer Experience</Typography>
+            </Box>
+
+            <Typography variant="body1" sx={{ mb: 4 }}>
+              Configure your logo, color, and wholesalers and carriers for the
+              customer portal. Learn more
+            </Typography>
+            <Paper elevation={3} sx={{ padding: "7px" }}>
+              <Tabs
+                value={themeTab}
+                onChange={handleThemeTab}
+                indicatorColor="primary"
+                textColor="primary"
+              >
+                <Tab label="Branding" />
+                <Tab label="Customer Portal" />
+              </Tabs>
+              <hr style={{ borderTop: "1px #ccc", marginTop: "0px" }} />
+              {themeTab === 0 && (
+                <div style={{ margin: "20px" }}>
+                  <Typography variant="h5">Branding</Typography>
+                  <Typography>
+                    Set up your primary color and logo. These will be visible at
+                    checkout, emails and the customer portal. For best results,
+                    upload a horizontal logo with a transparent background in
+                    SVG, PNG, or JPG. Selected File
+                  </Typography>
+
+                  <Box
+                    sx={{ width: "100%", maxWidth: "800px", margin: "0 auto" }}
+                  >
+                    {themeFileName && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "10px",
+                          padding: "10px",
+                          border: "1px solid #ccc",
+                          borderRadius: "4px",
+                          backgroundColor: "#f9f9f9",
+                        }}
+                      >
+                        <Typography variant="body1">{themeFileName}</Typography>
+                        <IconButton
+                          onClick={handleThemeFileDelete}
+                          color="error"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    )}
+
+                    <Box
+                      component="label"
+                      sx={{
+                        width: "calc(100% - 14px)", // Make width full but leave some margin (7px each side)
+                        margin: "0 auto", // Center the label box
+                        display: "block",
+                        padding: "20px",
+                        border: "2px dashed #ccc",
+                        borderRadius: "4px",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        backgroundColor: "#f7f7f7",
+                        ":hover": {
+                          borderColor: "#888",
+                        },
+                        mb: 4,
+                      }}
+                    >
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handleThemeFileChange}
+                        style={{ display: "none" }}
+                      />
+                      <UploadFileIcon fontSize="large" color="action" />
+                      <Typography variant="body1" color="textSecondary">
+                        Drop or Select file
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Drop files here or click <strong>browse</strong> through
+                        your machine
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Typography>Primary color (hex code)</Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginTop: "10px",
+                      marginBottom: "20px",
+                      padding: "10px",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                      backgroundColor: "#f9f9f9",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: "24px",
+                        height: "24px",
+                        backgroundColor: colorValue, // Color based on user input
+                        borderRadius: "50%",
+                        marginRight: "10px",
+                      }}
+                    />
+                    {isEditingColor ? (
+                      <TextField
+                        value={colorValue}
+                        onChange={handleColorChange}
+                        variant="outlined"
+                        size="small"
+                        sx={{ width: "100px" }}
+                      />
+                    ) : (
+                      <Typography>{colorValue}</Typography>
+                    )}
+                    <Button
+                      variant="text"
+                      onClick={handleEditColorClick}
+                      sx={{ marginLeft: "auto" }}
+                    >
+                      {isEditingColor ? "Save" : "Edit"}
+                    </Button>
+                  </Box>
+
+                  {/* Email template preview section */}
+                  <Box
+                    sx={{
+                      padding: "20px",
+                      backgroundColor: "#f7f7f7",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    <Paper
+                      elevation={3}
+                      sx={{ padding: "20px", marginTop: "20px" }}
+                    >
+                      <Typography variant="h5">Hi Jeremy,</Typography>
+                      <Typography variant="body1">
+                        Payment for your policy is due on [Date]. You can pay in
+                        full ($5,200.00) or pay over time ($600.00 per month).
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        sx={{
+                          backgroundColor: "#000",
+                          color: "#fff",
+                          marginTop: "10px",
+                          marginBottom: "20px",
+                          padding: "10px 20px",
+                          width: "100%",
+                        }}
+                      >
+                        SUBMIT PAYMENT
+                      </Button>
+                      <Typography variant="body1">
+                        Here are the details of your insurance policy (or
+                        policies):
+                      </Typography>
+                      <Box sx={{ marginTop: "20px" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "5px 0",
+                          }}
+                        >
+                          <Typography variant="body2">Insured</Typography>
+                          <Typography variant="body2">
+                            Acme Corp, LLC
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "5px 0",
+                          }}
+                        >
+                          <Typography variant="body2">Policy</Typography>
+                          <Typography variant="body2">
+                            General Liability
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "5px 0",
+                          }}
+                        >
+                          <Typography variant="body2">Policy Id</Typography>
+                          <Typography variant="body2">ABC-123</Typography>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  </Box>
+                </div>
+              )}
+
+              {themeTab === 1 && (
+                <div style={{ padding: "20px" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 0,
+                    }}
+                  >
+                    <Typography variant="h5">Customer portal</Typography>
+                    <div>
+                      <Button
+                        variant="contained"
+                        sx={{
+                          marginRight: "10px",
+                          backgroundColor: "white",
+                          color: "black",
+                        }}
+                      >
+                        Copy Link
+                      </Button>
+                      <Button
+                        variant="contained"
+                        sx={{ backgroundColor: "#3498db" }}
+                      >
+                        Visit Customer Portal
+                      </Button>
+                    </div>
+                  </Box>
+
+                  <Typography variant="body1" sx={{ mb: 4 }}>
+                    Customers can use this portal to stay on top of their
+                    payments.
+                  </Typography>
+                  <hr
+                    style={{ borderTop: "1px dashed #ccc", marginTop: "20px" }}
+                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 0,
+                    }}
+                  >
+                    <Typography variant="h5">
+                      Wholesalers and carriers for Customer Portal
+                    </Typography>
+
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "white",
+                        color: "black",
+                        marginTop: "25px",
+                      }}
+                    >
+                      Add WholeSaler Or Carrier
+                    </Button>
+                  </Box>
+
+                  <Typography variant="body1" sx={{ mb: 4 }}>
+                    Customers will see their wholesalers and carriers’ payment
+                    portals at login and can pay through their sites directly.
+                  </Typography>
+                  <TableContainer>
+                    <Table>
+                      <TableHead className={styles.lightGrayHeader}>
+                        <TableRow>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Type</TableCell>
+                          <TableCell>Phone</TableCell>
+                          <TableCell>Link</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell colSpan={5} align="center">
+                            No wholesalers or carriers found
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </div>
+              )}
+            </Paper>
           </div>
         )}
       </div>
@@ -928,8 +1401,9 @@ const SettingsForm = () => {
               for one-time payments.
             </Typography>
             <RadioGroup
-              value={accountTypeOperational}
-              onChange={(e) => setAccountTypeOperational(e.target.value)}
+              value={bankDetails.oneTimePaymentAccount}
+              onChange={handleBankDetailsInputChange}
+              name="oneTimePaymentAccount"
               row={false}
             >
               <FormControlLabel
@@ -948,7 +1422,7 @@ const SettingsForm = () => {
 
         <DialogActions>
           <Button
-            onClick={handleCloseEditBankDialog}
+            onClick={handleSaveBankDetails}
             color="primary"
             sx={{
               marginRight: "20px",

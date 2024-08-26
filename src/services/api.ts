@@ -235,3 +235,39 @@ export const updateCompanyDetails = async (
     throw error;
   }
 };
+
+export const registerBankDetails = async (
+  bankDetails: {
+    accountTypeOperational: string;
+    operationalAccountHolderName: string;
+    operationalAccountNumber: string;
+    operationalRoutingNumber: string;
+    accountTypeTrust: string;
+    trustAccountHolderName: string;
+    trustAccountNumber: string;
+    trustRoutingNumber: string;
+    sameAsOperational: boolean;
+    oneTimePaymentAccount: string;
+  },
+  companyId: string
+) => {
+  try {
+    console.log(bankDetails);
+    const response = await api.post(`/bank-details/${companyId}`, bankDetails);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating company details:", error);
+    throw error;
+  }
+};
+
+export const getBankDetails = async (companyId: any) => {
+  try {
+    const response = await api.get(`/bank-details/${companyId}`)
+    console.log(response.data , "ITS BANK DETAILS RESPONSE FROM GET API")
+    return response.data;
+  } catch (error) {
+    console.error("Error getting company details:", error);
+    throw error;
+  }
+}
