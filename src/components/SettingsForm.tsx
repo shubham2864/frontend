@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import {
+  editBankDetails,
   getBankDetails,
   getProfile,
   getSingleProfile,
@@ -395,12 +396,50 @@ const SettingsForm = () => {
   };
 
   const handleUploadAllDetails = async () => {
-    try {
-      
-    } catch (error) {
-      console.log(error)
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      // formData.append('fieldName', 'value');
+      if (bankDetails.accountTypeOperational)
+        formData.append(
+          "accountTypeOperational",
+          bankDetails.accountTypeOperational
+        );
+      if (bankDetails.operationalAccountHolderName)
+        formData.append(
+          "operationalAccountHolderName",
+          bankDetails.operationalAccountHolderName
+        );
+      if (bankDetails.operationalAccountNumber)
+        formData.append(
+          "operationalAccountNumber",
+          bankDetails.operationalAccountNumber
+        );
+      if (bankDetails.operationalRoutingNumber)
+        formData.append(
+          "operationalRoutingNumber",
+          bankDetails.operationalRoutingNumber
+        );
+      if (sameAsOperational !== undefined)
+        formData.append("sameAsOperational", String(sameAsOperational)); // Convert boolean to string
+
+      if (bankDetails.oneTimePaymentAccount)
+        formData.append(
+          "oneTimePaymentAccount",
+          bankDetails.oneTimePaymentAccount
+        );
+      try {
+        await editBankDetails(companyDetails!._id, formData);
+        // Handle success
+        console.log("Bank details updated successfully");
+      } catch (error) {
+        // Handle error
+        console.error("Error uploading bank details:", error);
+      }
+    } else {
+      console.log("No file selected");
     }
-  }
+  };
 
   const handleOpenEditOrgDialog = () => {
     setEditOrgDialogOpen(true);

@@ -287,3 +287,17 @@ export const getBankDetails = async (companyId: any) => {
     throw error;
   }
 }
+
+export const editBankDetails = async (companyId: any, formData: FormData) => {
+  try {
+    const response = await api.put(`/bank-details/${companyId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating bank details:", error);
+    throw error;
+  }
+};
