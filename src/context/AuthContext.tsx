@@ -11,18 +11,31 @@ import { getCompanyDetails, getProfile } from "@/services/api";
 interface User {
   email: string;
 }
-
 interface Company {
   _id: string;
   companyName: string;
   mobileNumber: string;
   streetAddress: string;
+  streetAddress2?: string; // Optional
   city: string;
   state: string;
   zipCode: string;
-  website: string;
-  taxId: string;
-  type: string;
+  website?: string; // Optional
+  taxId?: string; // Optional
+  type?: string; // Optional
+  jobTitle?: string; // Optional
+  dateOfBirth?: string; // Optional
+  socialSecurityNumber?: string; // Optional
+  sAddress?: string; // Optional
+  sCity?: string; // Optional
+  sState?: string; // Optional
+  sZipCode?: string; // Optional
+  businessOwner?: Array<{
+    firstName?: string; // Optional
+    lastName?: string; // Optional
+    email?: string; // Optional
+    mobileNumber?: string; // Optional
+  }>;
 }
 
 interface AuthContextType {

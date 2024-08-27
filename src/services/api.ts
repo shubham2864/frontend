@@ -222,8 +222,24 @@ export const updateCompanyDetails = async (
     mobileNumber?: string;
     website?: string;
     streetAddress?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
     taxId?: string;
     type?: string;
+    businessOwner?: Array<{
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      mobileNumber?: string;
+      jobTitle?: string;
+      dateOfBirth?: string;
+      socialSecurityNumber?: string;
+      sAddress?: string;
+      sCity?: string;
+      sState?: string;
+      sZipCode?: string;
+    }>;
   },
   companyId: string
 ) => {

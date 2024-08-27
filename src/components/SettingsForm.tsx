@@ -48,6 +48,7 @@ import styles from "../styles/Settings.module.css";
 import { useAuth } from "@/context/AuthContext";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import { Add, Delete } from "@mui/icons-material";
 
 interface User {
   firstName: string;
@@ -106,8 +107,26 @@ const SettingsForm = () => {
     phone: "",
     website: "",
     address: "",
+    city: "",
+    state: "",
+    zipCode: "",
     taxId: "",
     type: "",
+    businessOwner: [
+      {
+        firstName: "",
+        lastName: "",
+        email: "",
+        mobileNumber: "",
+        jobTitle: "",
+        dateOfBirth: "",
+        socialSecurityNumber: "",
+        sAddress: "",
+        sCity: "",
+        sState: "",
+        sZipCode: "",
+      },
+    ],
   });
   const [bankDetails, setBankDetails] = useState({
     accountTypeOperational: "",
@@ -121,6 +140,8 @@ const SettingsForm = () => {
     sameAsOperational: false,
     oneTimePaymentAccount: "",
   });
+  const [orgDetailsSaved, setOrgDetailsSaved] = useState(true);
+  const [bankDetailsSaved, setBankDetailsSaved] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [role, setRole] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -161,10 +182,28 @@ const SettingsForm = () => {
           ...prevDetails,
           businessName: companyDetails.companyName,
           phone: companyDetails.mobileNumber,
-          website: companyDetails.website,
-          address: `${companyDetails.streetAddress}, ${companyDetails.city}, ${companyDetails.state}, ${companyDetails.zipCode}`,
+          website: companyDetails.website || "", // Ensuring website is always a string
+          address: `${companyDetails.streetAddress}`,
+          city: `${companyDetails.city}`,
+          state: `${companyDetails.state}`,
+          zipCode: `${companyDetails.zipCode}`,
           taxId: `${companyDetails.taxId}`,
           type: `${companyDetails.type}`,
+          businessOwner: companyDetails.businessOwner
+            ? companyDetails.businessOwner.map((owner: any) => ({
+                firstName: owner.firstName || "",
+                lastName: owner.lastName || "",
+                email: owner.email || "",
+                mobileNumber: owner.mobileNumber || "",
+                jobTitle: owner.jobTitle || "",
+                dateOfBirth: owner.dateOfBirth || "",
+                socialSecurityNumber: owner.socialSecurityNumber || "",
+                sAddress: owner.sAddress || "",
+                sCity: owner.sCity || "",
+                sState: owner.sState || "",
+                sZipCode: owner.sZipCode || "",
+              }))
+            : [], // If businessOwner is undefined, set an empty array
         }));
       }
     };
@@ -186,12 +225,60 @@ const SettingsForm = () => {
     fetchProfileAndUsers();
   }, [companyDetails]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setOrgDetails((prevDetails) => ({
       ...prevDetails,
       [name]: value,
     }));
+  };
+
+  const handleBusinessOwnerInputChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setOrgDetails((prevDetails) => {
+      const newBusinessOwner = [...prevDetails.businessOwner];
+      newBusinessOwner[index] = {
+        ...newBusinessOwner[index],
+        [name]: value,
+      };
+      return { ...prevDetails, businessOwner: newBusinessOwner };
+    });
+  };
+
+  const addNewBusiness = () => {
+    setOrgDetails((prevDetails) => ({
+      ...prevDetails,
+      businessOwner: [
+        ...prevDetails.businessOwner,
+        {
+          firstName: "",
+          lastName: "",
+          email: "",
+          mobileNumber: "",
+          jobTitle: "",
+          dateOfBirth: "",
+          socialSecurityNumber: "",
+          sAddress: "",
+          sCity: "",
+          sState: "",
+          sZipCode: "",
+        },
+      ],
+    }));
+  };
+
+  const removeBusiness = (index: number) => {
+    if (orgDetails.businessOwner.length > 1) {
+      setOrgDetails((prevDetails) => ({
+        ...prevDetails,
+        businessOwner: prevDetails.businessOwner.filter((_, i) => i !== index),
+      }));
+    }
   };
 
   const handleBankDetailsInputChange = (
@@ -205,7 +292,28 @@ const SettingsForm = () => {
   };
 
   const handleSameAsOperationalChange = (event: any) => {
-    setSameAsOperational(event.target.checked);
+    const { checked } = event.target;
+    setSameAsOperational(checked);
+
+    if (checked) {
+      // Copy operational account details to trust account details
+      setBankDetails((prevDetails) => ({
+        ...prevDetails,
+        accountTypeTrust: prevDetails.accountTypeOperational,
+        trustAccountHolderName: prevDetails.operationalAccountHolderName,
+        trustAccountNumber: prevDetails.operationalAccountNumber,
+        trustRoutingNumber: prevDetails.operationalRoutingNumber,
+      }));
+    } else {
+      // Clear trust account details if checkbox is unchecked
+      setBankDetails((prevDetails) => ({
+        ...prevDetails,
+        accountTypeTrust: "",
+        trustAccountHolderName: "",
+        trustAccountNumber: "",
+        trustRoutingNumber: "",
+      }));
+    }
   };
 
   const handleTabChange = (tab: string) => {
@@ -248,11 +356,28 @@ const SettingsForm = () => {
         mobileNumber: orgDetails.phone,
         website: orgDetails.website,
         streetAddress: orgDetails.address,
+        city: orgDetails.city,
+        state: orgDetails.state,
+        zipCode: orgDetails.zipCode,
         taxId: orgDetails.taxId,
         type: orgDetails.type,
+        businessOwner: orgDetails.businessOwner.map((owner) => ({
+          firstName: owner.firstName,
+          lastName: owner.lastName,
+          email: owner.email,
+          mobileNumber: owner.mobileNumber,
+          jobTitle: owner.jobTitle,
+          dateOfBirth: owner.dateOfBirth,
+          socialSecurityNumber: owner.socialSecurityNumber,
+          sAddress: owner.sAddress,
+          sCity: owner.sCity,
+          sState: owner.sState,
+          sZipCode: owner.sZipCode,
+        })),
       };
 
       await updateCompanyDetails(updatedOrgDetails, companyDetails!._id);
+      setOrgDetailsSaved(true);
       handleCloseEditOrgDialog();
     } catch (error) {
       console.error("Failed to save company details:", error);
@@ -262,11 +387,20 @@ const SettingsForm = () => {
   const handleSaveBankDetails = async () => {
     try {
       await registerBankDetails(bankDetails, companyDetails!._id);
+      setBankDetailsSaved(true);
       handleCloseEditBankDialog();
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleUploadAllDetails = async () => {
+    try {
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const handleOpenEditOrgDialog = () => {
     setEditOrgDialogOpen(true);
@@ -580,10 +714,72 @@ const SettingsForm = () => {
                   <span className={styles.separator}> - </span>
                   <span className={styles.fieldValue}>{orgDetails.type}</span>
                 </div>
-                <Typography variant="body1" sx={{ mb: 4 }}>
-                  Customers can use this portal to stay on top of their
-                  payments.
-                </Typography>
+                {orgDetails.businessOwner.map((owner, index) => (
+                  <div key={index}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        mb: 1,
+                        fontSize: "16px",
+                        color: "black",
+                        marginTop: index === 0 ? "20px" : "40px", // Add more margin for subsequent owners
+                      }}
+                    >
+                      Business owner {index + 1}
+                    </Typography>
+                    <CardContent>
+                      <div className={styles.fieldWithValueContainer}>
+                        <span className={styles.fieldLabel}>Name</span>
+                        <span className={styles.separator}> - </span>
+                        <span className={styles.fieldValue}>
+                          {owner.firstName + " " + owner.lastName}
+                        </span>
+                      </div>
+                      <div className={styles.fieldWithValueContainer}>
+                        <span className={styles.fieldLabel}>Job Title</span>
+                        <span className={styles.separator}> - </span>
+                        <span className={styles.fieldValue}>
+                          {owner.jobTitle}
+                        </span>
+                      </div>
+                      <div className={styles.fieldWithValueContainer}>
+                        <span className={styles.fieldLabel}>Email</span>
+                        <span className={styles.separator}> - </span>
+                        <span className={styles.fieldValue}>{owner.email}</span>
+                      </div>
+                      <div className={styles.fieldWithValueContainer}>
+                        <span className={styles.fieldLabel}>Date of Birth</span>
+                        <span className={styles.separator}> - </span>
+                        <span className={styles.fieldValue}>
+                          {owner.dateOfBirth}
+                        </span>
+                      </div>
+                      <div className={styles.fieldWithValueContainer}>
+                        <span className={styles.fieldLabel}>
+                          Social Security Number
+                        </span>
+                        <span className={styles.separator}> - </span>
+                        <span className={styles.fieldValue}>
+                          {owner.socialSecurityNumber}
+                        </span>
+                      </div>
+                      <div className={styles.fieldWithValueContainer}>
+                        <span className={styles.fieldLabel}>Address</span>
+                        <span className={styles.separator}> - </span>
+                        <span className={styles.fieldValue}>
+                          {owner.sAddress}
+                        </span>
+                      </div>
+                      <div className={styles.fieldWithValueContainer}>
+                        <span className={styles.fieldLabel}>Phone</span>
+                        <span className={styles.separator}> - </span>
+                        <span className={styles.fieldValue}>
+                          {owner.mobileNumber}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </div>
+                ))}
               </CardContent>
             </StyledCard>
 
@@ -711,73 +907,96 @@ const SettingsForm = () => {
                   </CardContent>
                 </FormControl>
 
-                <Typography
-                  variant="h6"
-                  style={{ marginTop: "20px", fontSize: "18px" }}
-                >
-                  Proof of bank account
-                </Typography>
-                <Typography variant="body2" style={{ marginBottom: "10px" }}>
-                  Can you please provide a legal document (e.g., SS-4
-                  confirmation letter, Letter 147C) that provides confirmation
-                  of the entity's legal name and TIN? We will need this document
-                  in order for you to transact with Link-Finance.
-                </Typography>
-                <Box
-                  sx={{ width: "100%", maxWidth: "800px", margin: "0 auto" }}
-                >
-                  {fileName && (
+                {orgDetailsSaved && bankDetailsSaved && (
+                  <>
+                    <Typography
+                      variant="h6"
+                      style={{ marginTop: "20px", fontSize: "18px" }}
+                    >
+                      Proof of bank account
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      style={{ marginBottom: "10px" }}
+                    >
+                      Can you please provide a legal document (e.g., SS-4
+                      confirmation letter, Letter 147C) that provides
+                      confirmation of the entity's legal name and TIN? We will
+                      need this document in order for you to transact with
+                      Link-Finance.
+                    </Typography>
                     <Box
                       sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "10px",
-                        padding: "10px",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        backgroundColor: "#f9f9f9",
+                        width: "100%",
+                        maxWidth: "800px",
+                        margin: "0 auto",
                       }}
                     >
-                      <Typography variant="body1">{fileName}</Typography>
-                      <IconButton onClick={handleFileDelete} color="error">
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  )}
+                      {fileName && (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: "10px",
+                            padding: "10px",
+                            border: "1px solid #ccc",
+                            borderRadius: "4px",
+                            backgroundColor: "#f9f9f9",
+                          }}
+                        >
+                          <Typography variant="body1">{fileName}</Typography>
+                          <IconButton onClick={handleFileDelete} color="error">
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      )}
 
-                  <Box
-                    component="label"
-                    sx={{
-                      width: "100%",
-                      display: "block",
-                      padding: "20px",
-                      border: "2px dashed #ccc",
-                      borderRadius: "4px",
-                      textAlign: "center",
-                      cursor: "pointer",
-                      backgroundColor: "#f7f7f7",
-                      ":hover": {
-                        borderColor: "#888",
-                      },
-                    }}
-                  >
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={handleFileChange}
-                      style={{ display: "none" }}
-                    />
-                    <UploadFileIcon fontSize="large" color="action" />
-                    <Typography variant="body1" color="textSecondary">
-                      Drop or Select file
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Drop files here or click <strong>browse</strong> through
-                      your machine
-                    </Typography>
-                  </Box>
-                </Box>
+                      <Box
+                        component="label"
+                        sx={{
+                          width: "100%",
+                          display: "block",
+                          padding: "20px",
+                          border: "2px dashed #ccc",
+                          borderRadius: "4px",
+                          textAlign: "center",
+                          cursor: "pointer",
+                          backgroundColor: "#f7f7f7",
+                          ":hover": {
+                            borderColor: "#888",
+                          },
+                        }}
+                      >
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          onChange={handleFileChange}
+                          style={{ display: "none" }}
+                        />
+                        <UploadFileIcon fontSize="large" color="action" />
+                        <Typography variant="body1" color="textSecondary">
+                          Drop or Select file
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          Drop files here or click <strong>browse</strong>{" "}
+                          through your machine
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <DialogActions>
+                      <Button
+                        onClick={() => {
+                          // Handle save logic here
+                          handleUploadAllDetails();
+                        }}
+                        color="primary"
+                      >
+                        Upload Details.
+                      </Button>
+                    </DialogActions>
+                  </>
+                )}
               </DialogContent>
             </StyledCard>
           </div>
@@ -1201,12 +1420,12 @@ const SettingsForm = () => {
             onChange={handleInputChange}
           />
           <TextField
+            margin="dense"
+            label="Type"
             type="text"
-            label="Address"
             fullWidth
-            margin="normal"
-            name="address"
-            value={orgDetails.address}
+            name="type"
+            value={orgDetails.type}
             onChange={handleInputChange}
           />
           <TextField
@@ -1219,14 +1438,184 @@ const SettingsForm = () => {
             onChange={handleInputChange}
           />
           <TextField
-            margin="dense"
-            label="Type"
             type="text"
+            label="Address"
             fullWidth
-            name="type"
-            value={orgDetails.type}
+            margin="normal"
+            name="address"
+            value={orgDetails.address}
             onChange={handleInputChange}
           />
+          <TextField
+            type="text"
+            label="City"
+            fullWidth
+            margin="normal"
+            name="city"
+            value={orgDetails.city}
+            onChange={handleInputChange}
+          />
+          <TextField
+            type="text"
+            label="State"
+            fullWidth
+            margin="normal"
+            name="state"
+            value={orgDetails.state}
+            onChange={handleInputChange}
+          />
+          <TextField
+            type="text"
+            label="Zip Code"
+            fullWidth
+            margin="normal"
+            name="zipCode"
+            value={orgDetails.zipCode}
+            onChange={handleInputChange}
+          />
+          <Typography>Business owner</Typography>
+          <Typography>
+            A person who manages, directs, or has significant control of your
+            company.
+          </Typography>
+          {orgDetails.businessOwner.map((business, index) => (
+            <div key={index} className={styles.businessForm}>
+              <Typography variant="h6" className={styles.heading3}>
+                <div className={styles.quoteHeader}>
+                  Business Form {index + 1}
+                  <IconButton
+                    onClick={() => removeBusiness(index)}
+                    className={styles.deleteButton}
+                  >
+                    <Delete />
+                  </IconButton>
+                </div>
+              </Typography>
+              <TextField
+                name="firstName"
+                label="First Name"
+                value={business.firstName}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="First Name"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                name="lastName"
+                label="Last Name"
+                value={business.lastName}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="Last Name"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                name="email"
+                label="Email"
+                value={business.email}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="Email"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                name="mobileNumber"
+                label="Mobile Number"
+                value={business.mobileNumber}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="Mobile Number"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <Typography>Representative, CEO, etc.</Typography>
+              <TextField
+                name="jobTitle"
+                label="Job Title"
+                value={business.jobTitle}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="Job Title"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                name="dateOfBirth"
+                label="Date of Birth"
+                value={business.dateOfBirth}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="Date of Birth"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <Typography>
+                Only used to verify your identity — no credit checks. Learn more{" "}
+              </Typography>
+              <TextField
+                name="socialSecurityNumber"
+                label="Social Security Number"
+                value={business.socialSecurityNumber}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="Social Security Number"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                name="sAddress"
+                label="Address"
+                value={business.sAddress}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="Address"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                name="sCity"
+                label="City"
+                value={business.sCity}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="City"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                name="sState"
+                label="State"
+                value={business.sState}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="State"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                name="sZipCode"
+                label="Zip Code"
+                value={business.sZipCode}
+                onChange={(e) => handleBusinessOwnerInputChange(index, e)}
+                placeholder="Zip Code"
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </div>
+          ))}
+
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<Add />}
+            onClick={addNewBusiness}
+          >
+            Add More
+          </Button>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditOrgDialog} color="secondary">
