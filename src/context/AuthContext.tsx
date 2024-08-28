@@ -23,6 +23,7 @@ interface Company {
   website?: string; // Optional
   taxId?: string; // Optional
   type?: string; // Optional
+  isVerified?: boolean;
   jobTitle?: string; // Optional
   dateOfBirth?: string; // Optional
   socialSecurityNumber?: string; // Optional

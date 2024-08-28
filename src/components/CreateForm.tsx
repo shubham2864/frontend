@@ -26,6 +26,7 @@ import Link from "next/link";
 import { fetchCustomerDetails } from "../services/api"; // Adjust import path as necessary
 import { useRouter } from "next/router";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 interface Quote {
   quoteNumber: string;
@@ -59,6 +60,7 @@ const CreatePage = () => {
     Zip: "",
   });
   const router = useRouter();
+  const { companyDetails } = useAuth();
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [Add2, setAdd2] = useState([
     {

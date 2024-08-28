@@ -1,3 +1,4 @@
+import { PendingCompanies } from "@/types/types";
 import axios from "axios";
 
 const api = axios.create({
@@ -227,6 +228,7 @@ export const updateCompanyDetails = async (
     zipCode?: string;
     taxId?: string;
     type?: string;
+    isVerified?: boolean;
     businessOwner?: Array<{
       firstName?: string;
       lastName?: string;
@@ -295,9 +297,42 @@ export const editBankDetails = async (companyId: any, formData: FormData) => {
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log(response.data)
     return response.data;
   } catch (error) {
     console.error("Error updating bank details:", error);
+    throw error;
+  }
+};
+
+export const getPendingCompanies = async (): Promise<PendingCompanies> => {
+  try {
+    console.log("")
+    const response = await api.get('/companies/pending');
+    console.log(response.data + "its all companies till date")
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch pending companies", error);
+    throw new Error("Failed to fetch pending companies");
+  }
+};
+
+export const verifyCompany = async (companyId: string) => {
+  try {
+    const response = await api.put(`/companies/${companyId}`,{ isVerified: true });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to verify company", error);
+    throw new Error("Failed to verify company");
+  }
+};
+
+export const sendApprovalRequest = async (formData: any) => {
+  try {
+    const response = await api.post(`/admin/approval`,formData);
+    return response.data; // Assuming response data contains approval status
+  } catch (error) {
+    console.error("Error sending approval request:", error);
     throw error;
   }
 };

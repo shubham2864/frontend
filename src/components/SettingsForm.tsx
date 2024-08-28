@@ -9,6 +9,7 @@ import {
   getSingleProfile,
   getUsers,
   registerBankDetails,
+  sendApprovalRequest,
   updateCompanyDetails,
   updateProfile,
 } from "@/services/api";
@@ -42,6 +43,7 @@ import {
   TableCell,
   TableBody,
   Tab,
+  CircularProgress,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { styled } from "@mui/material/styles";
@@ -113,6 +115,7 @@ const SettingsForm = () => {
     zipCode: "",
     taxId: "",
     type: "",
+    isVerified: false,
     businessOwner: [
       {
         firstName: "",
@@ -149,7 +152,8 @@ const SettingsForm = () => {
   const [editOrgDialogOpen, setEditOrgDialogOpen] = useState(false);
   const [editBankDialogOpen, setEditBankDialogOpen] = useState(false);
   const [editProfileDialogOpen, setEditProfileDialogOpen] = useState(false);
-  const [verified, setVerified] = useState("Pending");
+  const [verified, setVerified] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [profileToEdit, setProfileToEdit] = useState<Partial<User>>({});
   const [sameAsOperational, setSameAsOperational] = useState(false);
   const [fileName, setFileName] = useState("");
@@ -177,7 +181,6 @@ const SettingsForm = () => {
           console.error("Error fetching profile or users:", error);
         }
       }
-
       if (companyDetails) {
         setOrgDetails((prevDetails) => ({
           ...prevDetails,
@@ -190,6 +193,7 @@ const SettingsForm = () => {
           zipCode: `${companyDetails.zipCode}`,
           taxId: `${companyDetails.taxId}`,
           type: `${companyDetails.type}`,
+          isVerified: companyDetails.isVerified ?? false,
           businessOwner: companyDetails.businessOwner
             ? companyDetails.businessOwner.map((owner: any) => ({
                 firstName: owner.firstName || "",
@@ -206,6 +210,9 @@ const SettingsForm = () => {
               }))
             : [], // If businessOwner is undefined, set an empty array
         }));
+        if (companyDetails?.isVerified !== undefined) {
+          setVerified(companyDetails.isVerified);
+        }
       }
     };
 
@@ -397,6 +404,15 @@ const SettingsForm = () => {
 
   const handleUploadAllDetails = async () => {
     if (file) {
+      const approvalData = {
+        businessName: orgDetails.businessName,
+        businessOwner: orgDetails.businessOwner.map((owner) => ({
+          firstName: owner.firstName,
+          lastName: owner.lastName,
+          email: owner.email,
+          mobileNumber: owner.mobileNumber,
+        })),
+      };
       const formData = new FormData();
       formData.append("file", file);
       // formData.append('fieldName', 'value');
@@ -428,13 +444,23 @@ const SettingsForm = () => {
           "oneTimePaymentAccount",
           bankDetails.oneTimePaymentAccount
         );
+
+      setIsLoading(true);
       try {
+        await updateCompanyDetails(
+          {
+            ...companyDetails, // Spread the current company details to retain existing values
+            isVerified: false, // Explicitly set the isVerified field to "Verified"
+          },
+          companyDetails!._id // Pass the company ID
+        );
         await editBankDetails(companyDetails!._id, formData);
-        // Handle success
         console.log("Bank details updated successfully");
       } catch (error) {
         // Handle error
         console.error("Error uploading bank details:", error);
+      } finally {
+        setIsLoading(false);
       }
     } else {
       console.log("No file selected");
@@ -681,7 +707,7 @@ const SettingsForm = () => {
                   fontWeight: "bold",
                 }}
               >
-                {verified}
+                {orgDetails.isVerified === true ? "Verified" : "Pending"}
               </p>
             </div>
             <p
@@ -1033,6 +1059,7 @@ const SettingsForm = () => {
                       >
                         Upload Details.
                       </Button>
+                      {isLoading && <CircularProgress color="secondary" />}
                     </DialogActions>
                   </>
                 )}

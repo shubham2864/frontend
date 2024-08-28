@@ -44,6 +44,12 @@ const Navbar: React.FC = () => {
     setSidebarOpen(false);
   };
 
+  const handleOrgClick = () => {
+    router.push('/settings');
+    setSidebarOpen(false); // Close the sidebar when navigating
+    setModalOpen(false)
+  };
+
   if (hideNavbar) {
     return null;
   }
@@ -157,6 +163,7 @@ const Navbar: React.FC = () => {
         isOpen={modalOpen}
         onClose={handleModalClose}
         onSelect={handleModalSelect}
+        handleOrgClick={handleOrgClick}
       />
     </>
   );
