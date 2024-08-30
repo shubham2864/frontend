@@ -60,6 +60,13 @@ interface User {
   phoneNumber: string;
   role: string;
   companyId: string;
+  jobTitle: string;
+  dateOfBirth: string;
+  socialSecurityNumber: string;
+  sAddress: string;
+  sCity: string;
+  sState: string;
+  sZipCode: string;
 }
 
 const StyledCard = styled(Card)({
@@ -96,6 +103,7 @@ const FieldWithValue: React.FC<FieldWithValueProps> = ({ label, value }) => (
 const SettingsForm = () => {
   const [activeTab, setActiveTab] = useState("userManagement");
   const { companyDetails } = useAuth();
+
   const [profile, setProfile] = useState({
     firstName: "",
     lastName: "",
@@ -105,6 +113,7 @@ const SettingsForm = () => {
     phoneNumber: "",
     role: "",
   });
+
   const [orgDetails, setOrgDetails] = useState({
     businessName: "",
     phone: "",
@@ -132,6 +141,7 @@ const SettingsForm = () => {
       },
     ],
   });
+
   const [bankDetails, setBankDetails] = useState({
     accountTypeOperational: "",
     operationalAccountHolderName: "",
@@ -184,22 +194,23 @@ const SettingsForm = () => {
       if (companyDetails) {
         setOrgDetails((prevDetails) => ({
           ...prevDetails,
-          businessName: companyDetails.companyName,
-          phone: companyDetails.mobileNumber,
-          website: companyDetails.website || "", // Ensuring website is always a string
-          address: `${companyDetails.streetAddress}`,
-          city: `${companyDetails.city}`,
-          state: `${companyDetails.state}`,
-          zipCode: `${companyDetails.zipCode}`,
-          taxId: `${companyDetails.taxId}`,
-          type: `${companyDetails.type}`,
+          businessName: companyDetails.companyName || "",
+          phone: companyDetails.mobileNumber || "",
+          website: companyDetails.website || "",
+          address: companyDetails.streetAddress || "",
+          city: companyDetails.city || "",
+          state: companyDetails.state || "",
+          zipCode: companyDetails.zipCode || "",
+          taxId: companyDetails.taxId || "", // Assign empty string if taxId is undefined
+          type: companyDetails.type || "", // Assign empty string if type is undefined
           isVerified: companyDetails.isVerified ?? false,
           businessOwner: companyDetails.businessOwner
-            ? companyDetails.businessOwner.map((owner: any) => ({
+            ? users.filter((user: User) => user.role === "admin")
+            .map((owner: User) => ({
                 firstName: owner.firstName || "",
                 lastName: owner.lastName || "",
                 email: owner.email || "",
-                mobileNumber: owner.mobileNumber || "",
+                mobileNumber: owner.phoneNumber || "",
                 jobTitle: owner.jobTitle || "",
                 dateOfBirth: owner.dateOfBirth || "",
                 socialSecurityNumber: owner.socialSecurityNumber || "",
@@ -383,7 +394,6 @@ const SettingsForm = () => {
           sZipCode: owner.sZipCode,
         })),
       };
-
       await updateCompanyDetails(updatedOrgDetails, companyDetails!._id);
       setOrgDetailsSaved(true);
       handleCloseEditOrgDialog();

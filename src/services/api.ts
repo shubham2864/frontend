@@ -217,39 +217,80 @@ export const fetchCustomerDetails = async (email: string) => {
   return response.data;
 };
 
-export const updateCompanyDetails = async (
-  orgDetails: {
-    companyName?: string;
-    mobileNumber?: string;
-    website?: string;
-    streetAddress?: string;
-    city?: string;
-    state?: string;
-    zipCode?: string;
-    taxId?: string;
-    type?: string;
-    isVerified?: boolean;
-    businessOwner?: Array<{
-      firstName?: string;
-      lastName?: string;
-      email?: string;
-      mobileNumber?: string;
-      jobTitle?: string;
-      dateOfBirth?: string;
-      socialSecurityNumber?: string;
-      sAddress?: string;
-      sCity?: string;
-      sState?: string;
-      sZipCode?: string;
-    }>;
-  },
-  companyId: string
-) => {
+export const updateCompanyDetails = async (orgDetails: any, companyId: string) => {
+  const {
+    companyName,
+    mobileNumber,
+    website,
+    streetAddress,
+    city,
+    state,
+    zipCode,
+    taxId,
+    type,
+    businessOwner,
+    isVerified
+  } = orgDetails;
+
   try {
-    const response = await api.put(`/companies/${companyId}`, orgDetails);
-    return response.data;
+    // Update organization details first
+    await api.put(`/companies/${companyId}`, {
+      companyName,
+      mobileNumber,
+      website,
+      streetAddress,
+      city,
+      state,
+      zipCode,
+      taxId,
+      type,
+      isVerified
+    });
+
+    // Update or create business owner details
+    for (const owner of businessOwner) {
+      try {
+        // Attempt to find and update the user by email
+        await api.put(`/user/${owner.email}`, {
+          firstName: owner.firstName,
+          lastName: owner.lastName,
+          email: owner.email,
+          mobileNumber: owner.mobileNumber,
+          jobTitle: owner.jobTitle,
+          dateOfBirth: owner.dateOfBirth,
+          socialSecurityNumber: owner.socialSecurityNumber,
+          sAddress: owner.sAddress,
+          sCity: owner.sCity,
+          sState: owner.sState,
+          sZipCode: owner.sZipCode,
+          companyId: companyId,
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          // If user is not found, create a new user
+          await api.post(`/user/newUser`, {
+            firstName: owner.firstName,
+            lastName: owner.lastName,
+            email: owner.email,
+            phoneNumber: owner.mobileNumber,
+            jobTitle: owner.jobTitle,
+            dateOfBirth: owner.dateOfBirth,
+            socialSecurityNumber: owner.socialSecurityNumber,
+            sAddress: owner.sAddress,
+            sCity: owner.sCity,
+            sState: owner.sState,
+            sZipCode: owner.sZipCode,
+            password: "Shubham@2003",
+            confirmPassword: "Shubham@2003",
+            companyId: companyId,
+          });
+        } else {
+          console.error(`Failed to update or create user ${owner.email}:`, error);
+        }
+      }
+    }
   } catch (error) {
-    console.error("Error updating company details:", error);
+    console.error("Error updating details:", error);
     throw error;
   }
 };
@@ -281,23 +322,23 @@ export const registerBankDetails = async (
 
 export const getBankDetails = async (companyId: any) => {
   try {
-    const response = await api.get(`/bank-details/${companyId}`)
-    console.log(response.data , "ITS BANK DETAILS RESPONSE FROM GET API")
+    const response = await api.get(`/bank-details/${companyId}`);
+    console.log(response.data, "ITS BANK DETAILS RESPONSE FROM GET API");
     return response.data;
   } catch (error) {
     console.error("Error getting company details:", error);
     throw error;
   }
-}
+};
 
 export const editBankDetails = async (companyId: any, formData: FormData) => {
   try {
     const response = await api.put(`/bank-details/${companyId}`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
-    console.log(response.data)
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error updating bank details:", error);
@@ -307,9 +348,9 @@ export const editBankDetails = async (companyId: any, formData: FormData) => {
 
 export const getPendingCompanies = async (): Promise<PendingCompanies> => {
   try {
-    console.log("")
-    const response = await api.get('/companies/pending');
-    console.log(response.data + "its all companies till date")
+    console.log("");
+    const response = await api.get("/companies/pending");
+    console.log(response.data + "its all companies till date");
     return response.data;
   } catch (error) {
     console.error("Failed to fetch pending companies", error);
@@ -319,7 +360,9 @@ export const getPendingCompanies = async (): Promise<PendingCompanies> => {
 
 export const verifyCompany = async (companyId: string) => {
   try {
-    const response = await api.put(`/companies/${companyId}`,{ isVerified: true });
+    const response = await api.put(`/companies/${companyId}`, {
+      isVerified: true,
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to verify company", error);
@@ -329,7 +372,7 @@ export const verifyCompany = async (companyId: string) => {
 
 export const sendApprovalRequest = async (formData: any) => {
   try {
-    const response = await api.post(`/admin/approval`,formData);
+    const response = await api.post(`/admin/approval`, formData);
     return response.data; // Assuming response data contains approval status
   } catch (error) {
     console.error("Error sending approval request:", error);
