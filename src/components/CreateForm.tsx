@@ -46,6 +46,7 @@ interface Quote {
   commission: number;
   agencyFees: number;
   file: File | null;
+  totalCost: number;
 }
 
 const CreatePage = () => {
@@ -64,7 +65,7 @@ const CreatePage = () => {
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [Add2, setAdd2] = useState([
     {
-      Buisness: "",
+      BuisnessName: "",
       Address: "",
       Address2: "",
       city: "",
@@ -91,6 +92,7 @@ const CreatePage = () => {
       commission: 0,
       agencyFees: 0,
       file: null,
+      totalCost: 0,
     },
   ]);
 
@@ -101,6 +103,26 @@ const CreatePage = () => {
   const steps = ["Select or create a customer", "Upload Quote", "Review Quote"];
   const showBusinessForm = customerType === "commercial";
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [errors, setErrors] = useState({
+    Add1: {
+      email: "",
+      firstname: "",
+      lastname: "",
+      contact: "",
+      Address: "",
+      city: "",
+      state: "",
+      Zip: "",
+    },
+    Add2: Add2.map(() => ({
+      BuisnessName: "",
+      Address: "",
+      Address2: "",
+      city: "",
+      state: "",
+      Zip: "",
+    })),
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAdd1({
@@ -124,7 +146,7 @@ const CreatePage = () => {
     setAdd2([
       ...Add2,
       {
-        Buisness: "",
+        BuisnessName: "",
         Address: "",
         Address2: "",
         city: "",
@@ -132,6 +154,24 @@ const CreatePage = () => {
         Zip: "",
       },
     ]);
+  
+    setErrors((prevErrors) => {
+      const currentErrors = prevErrors || { Add1: {}, Add2: [] };
+      return {
+        ...currentErrors,
+        Add2: [
+          ...(currentErrors.Add2 || []),
+          {
+            BuisnessName: "",
+            Address: "",
+            Address2: "",
+            city: "",
+            state: "",
+            Zip: "",
+          },
+        ],
+      };
+    });
   };
 
   const removeBusiness = (index: number) => {
@@ -217,44 +257,43 @@ const CreatePage = () => {
         commission: 0,
         agencyFees: 0,
         file: null,
+        totalCost: 0,
       },
     ]);
   };
 
   const isStepComplete = (step: number) => {
+    let hasError = false;
+    const newErrors = { Add1: { ...errors.Add1 }, Add2: { ...errors.Add2 } };
+
+    // Validate Add1
     if (step === 0) {
-      return (
-        Add1.email &&
-        Add1.firstname &&
-        Add1.lastname &&
-        Add1.contact &&
-        Add1.Address &&
-        Add1.city &&
-        Add1.state &&
-        Add1.Zip
-      );
-    } else if (step === 1) {
-      return quotes.every(
-        (quote) =>
-          quote.quoteNumber &&
-          quote.policyNumber &&
-          quote.carrierCompany &&
-          quote.wholesaler &&
-          quote.coverage &&
-          quote.effectiveDate &&
-          quote.expirationDate &&
-          quote.minDaysToCancel !== undefined &&
-          quote.minEarnedRate !== undefined &&
-          quote.premium !== undefined &&
-          quote.taxes !== undefined &&
-          quote.otherFees !== undefined &&
-          quote.brokerFee !== undefined &&
-          quote.policyFee !== undefined &&
-          quote.commission !== undefined &&
-          quote.agencyFees !== undefined
-      );
+      Object.keys(Add1).forEach((key) => {
+        if (!Add1[key as keyof typeof Add1]) {
+          newErrors.Add1[key as keyof typeof Add1] = `${key} is required`;
+          hasError = true;
+        } else {
+          newErrors.Add1[key as keyof typeof Add1] = "";
+        }
+      });
     }
-    return true;
+
+    // Validate Add2 if "commercial" customer type is selected
+    if (customerType === "commercial") {
+      Add2.forEach((business, index) => {
+        Object.keys(business).forEach((key) => {
+          if (!business[key as keyof typeof business]) {
+            newErrors.Add2[index][key as keyof typeof business] = `${key} is required`;
+            hasError = true;
+          } else {
+            newErrors.Add2[index][key as keyof typeof business] = "";
+          }
+        });
+      });
+    }
+
+    setErrors(newErrors);
+    return !hasError;
   };
 
   const removeQuote = (index: any) => {
@@ -281,6 +320,7 @@ const CreatePage = () => {
     commission: 0,
     agencyFees: 0,
     file: null,
+    totalCost: 0,
   };
 
   const handleResetCustomer = () => {
@@ -306,6 +346,7 @@ const CreatePage = () => {
     }
 
     if (activeStep === steps.length - 1) {
+      console.log({Add2})
       try {
         await axios.post(
           "http://localhost:3001/agreement",
@@ -327,28 +368,26 @@ const CreatePage = () => {
     }
   };
 
-  const calculateTotalCost = () => {
-    return quotes
-      .map((quote) => {
-        const premium = Number(quote.premium) || 0;
-        const taxes = Number(quote.taxes) || 0;
-        const otherFees = Number(quote.otherFees) || 0;
-        const brokerFee = Number(quote.brokerFee) || 0;
-        const policyFee = Number(quote.policyFee) || 0;
-        const commission = Number(quote.commission) || 0;
-        const agencyFees = Number(quote.agencyFees) || 0;
+  const calculateTotalForQuote = (quote: any) => {
+    const premium = Number(quote.premium) || 0;
+    const taxes = Number(quote.taxes) || 0;
+    const otherFees = Number(quote.otherFees) || 0;
+    const brokerFee = Number(quote.brokerFee) || 0;
+    const policyFee = Number(quote.policyFee) || 0;
+    const commission = Number(quote.commission) || 0;
+    const agencyFees = Number(quote.agencyFees) || 0;
+  
+    const totalForQuote =
+      premium +
+      taxes +
+      otherFees +
+      brokerFee +
+      policyFee +
+      commission +
+      agencyFees;
 
-        return (
-          premium +
-          taxes +
-          otherFees +
-          brokerFee +
-          policyFee +
-          commission +
-          agencyFees
-        );
-      })
-      .reduce((acc, cost) => acc + cost, 0);
+      console.log(totalForQuote)
+    return totalForQuote;
   };
 
   return (
@@ -413,6 +452,8 @@ const CreatePage = () => {
                 InputProps={{
                   readOnly: true,
                 }}
+                error={!!errors.Add1.email}
+                helperText={errors.Add1.email}
               />
             </Grid>
             <Grid container spacing={2}>
@@ -426,6 +467,8 @@ const CreatePage = () => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
+                  error={!!errors.Add1.firstname}
+                  helperText={errors.Add1.firstname}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -438,6 +481,8 @@ const CreatePage = () => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
+                  error={!!errors.Add1.lastname}
+                  helperText={errors.Add1.lastname}
                 />
               </Grid>
             </Grid>
@@ -450,6 +495,8 @@ const CreatePage = () => {
               fullWidth
               margin="normal"
               variant="outlined"
+              error={!!errors.Add1.Address}
+              helperText={errors.Add1.Address}
             />
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
@@ -462,6 +509,8 @@ const CreatePage = () => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
+                  error={!!errors.Add1.city}
+                  helperText={errors.Add1.city}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -491,6 +540,8 @@ const CreatePage = () => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
+                  error={!!errors.Add1.Zip}
+                  helperText={errors.Add1.Zip}
                 />
               </Grid>
             </Grid>
@@ -503,6 +554,8 @@ const CreatePage = () => {
               fullWidth
               margin="normal"
               variant="outlined"
+              error={!!errors.Add1.contact}
+              helperText={errors.Add1.contact}
             />
             <FormControl component="fieldset" margin="normal">
               <RadioGroup
@@ -539,16 +592,18 @@ const CreatePage = () => {
                   <TextField
                     name="Buisness"
                     label="Business Name"
-                    value={business.Buisness}
+                    value={business.BuisnessName}
                     onChange={(e) => {
                       const newBusiness = [...Add2];
-                      newBusiness[index].Buisness = e.target.value;
+                      newBusiness[index].BuisnessName = e.target.value;
                       setAdd2(newBusiness);
                     }}
                     placeholder="Business Name"
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    error={!!errors.Add2[index].BuisnessName}
+                    helperText={errors.Add2[index].BuisnessName}
                   />
                   <TextField
                     name="Address"
@@ -563,6 +618,8 @@ const CreatePage = () => {
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    error={!!errors.Add2[index].Address}
+                    helperText={errors.Add2[index].Address}
                   />
                   <TextField
                     name="Address2"
@@ -593,6 +650,8 @@ const CreatePage = () => {
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        error={!!errors.Add2[index].city}
+                        helperText={errors.Add2[index].city}
                       />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -609,6 +668,8 @@ const CreatePage = () => {
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        error={!!errors.Add2[index].state}
+                        helperText={errors.Add2[index].state}
                       />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -625,6 +686,8 @@ const CreatePage = () => {
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        error={!!errors.Add2[index].Zip}
+                        helperText={errors.Add2[index].Zip}
                       />
                     </Grid>
                   </Grid>
@@ -1006,7 +1069,7 @@ const CreatePage = () => {
                             <Grid item xs={12}>
                               <Typography variant="body1">
                                 <strong>Business Name:</strong>{" "}
-                                {business.Buisness}
+                                {business.BuisnessName}
                               </Typography>
                             </Grid>
                             <Grid item xs={12}>
@@ -1178,7 +1241,7 @@ const CreatePage = () => {
                       </Grid>
                     </Grid>
                     <Typography variant="h6">
-                      Total Cost: ${calculateTotalCost()}
+                      Total Cost: ${quote.totalCost = calculateTotalForQuote(quote)}
                     </Typography>
                   </>
                 )}

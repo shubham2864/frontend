@@ -176,72 +176,82 @@ const SettingsForm = () => {
 
   useEffect(() => {
     const fetchProfileAndUsers = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (token) {
         try {
-          const profileResponse = await getProfile(token as string);
+          const profileResponse = await getProfile(token);
           setProfile(profileResponse.data);
           setRole(profileResponse.data.role);
-
-          if (profileResponse.data.role === "admin") {
-            const usersResponse = await getUsers(token as string);
+  
+          if (profileResponse.data.role === 'admin') {
+            const usersResponse = await getUsers(token);
             setUsers(usersResponse);
+  
+            // Update orgDetails with businessOwner based on users
+            setOrgDetails((prevDetails) => ({
+              ...prevDetails,
+              businessOwner: usersResponse
+                .filter((user: User) => user.role === 'admin')
+                .map((owner: User) => ({
+                  firstName: owner.firstName || '',
+                  lastName: owner.lastName || '',
+                  email: owner.email || '',
+                  mobileNumber: owner.phoneNumber || '',
+                  jobTitle: owner.jobTitle || '',
+                  dateOfBirth: owner.dateOfBirth || '',
+                  socialSecurityNumber: owner.socialSecurityNumber || '',
+                  sAddress: owner.sAddress || '',
+                  sCity: owner.sCity || '',
+                  sState: owner.sState || '',
+                  sZipCode: owner.sZipCode || '',
+                })),
+            }));
           }
         } catch (error) {
-          console.error("Error fetching profile or users:", error);
+          console.error('Error fetching profile or users:', error);
         }
       }
+  
       if (companyDetails) {
         setOrgDetails((prevDetails) => ({
           ...prevDetails,
-          businessName: companyDetails.companyName || "",
-          phone: companyDetails.mobileNumber || "",
-          website: companyDetails.website || "",
-          address: companyDetails.streetAddress || "",
-          city: companyDetails.city || "",
-          state: companyDetails.state || "",
-          zipCode: companyDetails.zipCode || "",
-          taxId: companyDetails.taxId || "", // Assign empty string if taxId is undefined
-          type: companyDetails.type || "", // Assign empty string if type is undefined
+          businessName: companyDetails.companyName || '',
+          phone: companyDetails.mobileNumber || '',
+          website: companyDetails.website || '',
+          address: companyDetails.streetAddress || '',
+          city: companyDetails.city || '',
+          state: companyDetails.state || '',
+          zipCode: companyDetails.zipCode || '',
+          taxId: companyDetails.taxId || '',
+          type: companyDetails.type || '',
           isVerified: companyDetails.isVerified ?? false,
-          businessOwner: companyDetails.businessOwner
-            ? users.filter((user: User) => user.role === "admin")
-            .map((owner: User) => ({
-                firstName: owner.firstName || "",
-                lastName: owner.lastName || "",
-                email: owner.email || "",
-                mobileNumber: owner.phoneNumber || "",
-                jobTitle: owner.jobTitle || "",
-                dateOfBirth: owner.dateOfBirth || "",
-                socialSecurityNumber: owner.socialSecurityNumber || "",
-                sAddress: owner.sAddress || "",
-                sCity: owner.sCity || "",
-                sState: owner.sState || "",
-                sZipCode: owner.sZipCode || "",
-              }))
-            : [], // If businessOwner is undefined, set an empty array
         }));
+  
         if (companyDetails?.isVerified !== undefined) {
           setVerified(companyDetails.isVerified);
         }
       }
     };
-
+  
     const fetchBankDetails = async () => {
       if (companyDetails && companyDetails._id) {
         try {
           const data = await getBankDetails(companyDetails._id);
           if (data && data.length > 0) {
-            setBankDetails(data[0]); // Set the first object in the array to bankDetails
+            setBankDetails(data[0]);
+          }
+          if (companyDetails.isVerified === true) {
+            setBankDetailsSaved(false);
+            setOrgDetailsSaved(false);
           }
         } catch (error) {
-          console.error("Error fetching bank details:", error);
+          console.error('Error fetching bank details:', error);
         }
       }
     };
-
-    fetchBankDetails();
+  
     fetchProfileAndUsers();
+    fetchBankDetails();
   }, [companyDetails]);
 
   const handleInputChange = (
@@ -395,7 +405,7 @@ const SettingsForm = () => {
         })),
       };
       await updateCompanyDetails(updatedOrgDetails, companyDetails!._id);
-      setOrgDetailsSaved(true);
+      setOrgDetailsSaved(false);
       handleCloseEditOrgDialog();
     } catch (error) {
       console.error("Failed to save company details:", error);

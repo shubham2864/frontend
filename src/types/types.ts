@@ -18,5 +18,44 @@ export interface Company {
   companyName: string;
   businessOwner: BusinessOwner[];
 }
+export interface Add1Error {
+  email: string;
+  firstname: string;
+  lastname: string;
+  contact: string;
+  Address: string;
+  city: string;
+  state: string;
+  Zip: string;
+}
+
+export interface Add2Error {
+  BuisnessName: string;
+  Address: string;
+  Address2: string;
+  city: string;
+  state: string;
+  Zip: string;
+}
+
+export interface QuoteError {
+  quoteNumber: string;
+  policyNumber: string;
+  carrierCompany: string;
+  wholesaler: string;
+  coverage: string;
+  effectiveDate: string;
+  expirationDate: string;
+  minDaysToCancel: string; // It's a number in Quote, but for errors, it's a string (the error message)
+  minEarnedRate: string;
+  premium: string;
+  taxes: string;
+  otherFees: string;
+  brokerFee: string;
+  policyFee: string;
+  commission: string;
+  agencyFees: string;
+  file: string; // File validation is also a string error
+}
 
 export type PendingCompanies = Company[];
