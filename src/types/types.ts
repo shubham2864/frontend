@@ -58,4 +58,45 @@ export interface QuoteError {
   file: string; // File validation is also a string error
 }
 
+export interface AgreementDetails {
+  Add1: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    contact: string;
+    Address: string;
+    city: string;
+    state: string;
+    Zip: string;
+  };
+  Add2: {
+    BuisnessName: string;
+    Address: string;
+    Address2: string;
+    city: string;
+    state: string;
+    Zip: string;
+  }[];
+  quotes: {
+    quoteNumber: string;
+    policyNumber: string;
+    carrierCompany: string;
+    wholesaler: string;
+    coverage: string;
+    effectiveDate: string;
+    expirationDate: string;
+    minDaysToCancel: number;
+    minEarnedRate: number;
+    premium: number;
+    taxes: number;
+    otherFees: number;
+    brokerFee: number;
+    policyFee: number;
+    commission: number;
+    agencyFees: number;
+    file: File | null;
+    totalCost: number;
+  }[];
+}
+
 export type PendingCompanies = Company[];

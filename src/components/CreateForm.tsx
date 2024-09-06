@@ -23,10 +23,10 @@ import {
 import { Add, Delete } from "@mui/icons-material";
 import styles from "../styles/CreatePage.module.css"; // Import the CSS module
 import Link from "next/link";
-import { fetchCustomerDetails } from "../services/api"; // Adjust import path as necessary
 import { useRouter } from "next/router";
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 interface Quote {
   quoteNumber: string;
@@ -52,16 +52,15 @@ interface Quote {
 const CreatePage = () => {
   const [Add1, setAdd1] = useState({
     email: "",
-    firstname: "",
-    lastname: "",
+    firstName: "",
+    lastName: "",
     contact: "",
-    Address: "",
+    address: "",
     city: "",
     state: "",
-    Zip: "",
+    zip: "",
   });
   const router = useRouter();
-  const { companyDetails } = useAuth();
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [Add2, setAdd2] = useState([
     {
@@ -106,13 +105,13 @@ const CreatePage = () => {
   const [errors, setErrors] = useState({
     Add1: {
       email: "",
-      firstname: "",
-      lastname: "",
+      firstName: "",
+      lastName: "",
       contact: "",
-      Address: "",
+      address: "",
       city: "",
       state: "",
-      Zip: "",
+      zip: "",
     },
     Add2: Add2.map(() => ({
       BuisnessName: "",
@@ -128,6 +127,13 @@ const CreatePage = () => {
     setAdd1({
       ...Add1,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleContactChange = (value: string) => {
+    setAdd1({
+      ...Add1,
+      contact: value,
     });
   };
 
@@ -154,7 +160,7 @@ const CreatePage = () => {
         Zip: "",
       },
     ]);
-  
+
     setErrors((prevErrors) => {
       const currentErrors = prevErrors || { Add1: {}, Add2: [] };
       return {
@@ -181,16 +187,25 @@ const CreatePage = () => {
   };
 
   const handleEmailBlur = async () => {
-    try {
-      const response = await fetchCustomerDetails(Add1.email);
-      if (response) {
-        setIsAutocompleteComplete(true);
-        setEmailError(""); // Clear error message if email is found
-      }
-    } catch (error) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Check if the email field is empty
+    if (!Add1.email) {
+      setEmailError("Email is required");
       setIsAutocompleteComplete(false);
-      setEmailError("User not found"); // Set error message if email is not found
+      return;
     }
+
+    // Check if the email entered is valid
+    if (!emailRegex.test(Add1.email)) {
+      setEmailError("Please enter a valid email address");
+      setIsAutocompleteComplete(false);
+      return;
+    }
+
+    // If the email is valid, clear the error and set autocomplete as complete
+    setEmailError("");
+    setIsAutocompleteComplete(true);
   };
 
   const handleBack = () => {
@@ -283,7 +298,9 @@ const CreatePage = () => {
       Add2.forEach((business, index) => {
         Object.keys(business).forEach((key) => {
           if (!business[key as keyof typeof business]) {
-            newErrors.Add2[index][key as keyof typeof business] = `${key} is required`;
+            newErrors.Add2[index][
+              key as keyof typeof business
+            ] = `${key} is required`;
             hasError = true;
           } else {
             newErrors.Add2[index][key as keyof typeof business] = "";
@@ -326,13 +343,13 @@ const CreatePage = () => {
   const handleResetCustomer = () => {
     setAdd1({
       email: "",
-      firstname: "",
-      lastname: "",
+      firstName: "",
+      lastName: "",
       contact: "",
-      Address: "",
+      address: "",
       city: "",
       state: "",
-      Zip: "",
+      zip: "",
     });
     setQuotes([emptyQuoteTemplate]);
     setIsAutocompleteComplete(false);
@@ -346,9 +363,9 @@ const CreatePage = () => {
     }
 
     if (activeStep === steps.length - 1) {
-      console.log({Add2})
+      console.log({ Add2 });
       try {
-        await axios.post(
+        const response = await axios.post(
           "http://localhost:3001/agreement",
           { Add1, Add2, quotes },
           {
@@ -357,8 +374,9 @@ const CreatePage = () => {
             },
           }
         );
+        const { id } = response.data;
         alert("Form submitted successfully!");
-        router.push("/dashboard");
+        router.push(`/agreement/${id}`);
       } catch (error) {
         console.error("Error submitting form", error);
         alert("Error submitting form");
@@ -376,7 +394,7 @@ const CreatePage = () => {
     const policyFee = Number(quote.policyFee) || 0;
     const commission = Number(quote.commission) || 0;
     const agencyFees = Number(quote.agencyFees) || 0;
-  
+
     const totalForQuote =
       premium +
       taxes +
@@ -386,7 +404,7 @@ const CreatePage = () => {
       commission +
       agencyFees;
 
-      console.log(totalForQuote)
+    console.log(totalForQuote);
     return totalForQuote;
   };
 
@@ -459,44 +477,44 @@ const CreatePage = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <TextField
-                  name="firstname"
+                  name="firstName"
                   label="First Name"
-                  value={Add1.firstname}
+                  value={Add1.firstName}
                   onChange={handleInputChange}
                   placeholder="First Name"
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  error={!!errors.Add1.firstname}
-                  helperText={errors.Add1.firstname}
+                  error={!!errors.Add1.firstName}
+                  helperText={errors.Add1.firstName}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
-                  name="lastname"
+                  name="lastName"
                   label="Last Name"
-                  value={Add1.lastname}
+                  value={Add1.lastName}
                   onChange={handleInputChange}
                   placeholder="Last Name"
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  error={!!errors.Add1.lastname}
-                  helperText={errors.Add1.lastname}
+                  error={!!errors.Add1.lastName}
+                  helperText={errors.Add1.lastName}
                 />
               </Grid>
             </Grid>
             <TextField
-              name="Address"
+              name="address"
               label="Address"
-              value={Add1.Address}
+              value={Add1.address}
               onChange={handleInputChange}
               placeholder="Address"
               fullWidth
               margin="normal"
               variant="outlined"
-              error={!!errors.Add1.Address}
-              helperText={errors.Add1.Address}
+              error={!!errors.Add1.address}
+              helperText={errors.Add1.address}
             />
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
@@ -532,31 +550,30 @@ const CreatePage = () => {
               </Grid>
               <Grid item xs={12} md={4}>
                 <TextField
-                  name="Zip"
+                  name="zip"
                   label="Zip Code"
-                  value={Add1.Zip}
+                  value={Add1.zip}
                   onChange={handleInputChange}
                   placeholder="Zip Code"
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  error={!!errors.Add1.Zip}
-                  helperText={errors.Add1.Zip}
+                  error={!!errors.Add1.zip}
+                  helperText={errors.Add1.zip}
                 />
               </Grid>
             </Grid>
-            <TextField
-              name="contact"
-              label="Contact"
-              value={Add1.contact}
-              onChange={handleInputChange}
-              placeholder="Contact"
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              error={!!errors.Add1.contact}
-              helperText={errors.Add1.contact}
+            <PhoneInput
+              country={"us"} // Set a default country code
+              value={Add1.contact} // Bind the contact state here
+              onChange={handleContactChange} // Handle changes from the phone input
+              inputProps={{
+                name: "contact",
+                required: true,
+                autoFocus: true,
+              }}
             />
+            {/* {errors.contact && <p style={{ color: "red" }}>{errors.contact}</p>} */}
             <FormControl component="fieldset" margin="normal">
               <RadioGroup
                 value={customerType}
@@ -1019,13 +1036,13 @@ const CreatePage = () => {
                   <span>Email:</span> {Add1.email}
                 </Typography>
                 <Typography variant="h6">
-                  <span>First Name:</span> {Add1.firstname}
+                  <span>First Name:</span> {Add1.firstName}
                 </Typography>
                 <Typography variant="h6">
-                  <span>Last Name:</span> {Add1.lastname}
+                  <span>Last Name:</span> {Add1.lastName}
                 </Typography>
                 <Typography variant="h6">
-                  <span>Address:</span> {Add1.Address}
+                  <span>Address:</span> {Add1.address}
                 </Typography>
                 <Typography variant="h6">
                   <span>City:</span> {Add1.city}
@@ -1034,7 +1051,7 @@ const CreatePage = () => {
                   <span>State:</span> {Add1.state}
                 </Typography>
                 <Typography variant="h6">
-                  <span>Zip:</span> {Add1.Zip}
+                  <span>Zip:</span> {Add1.zip}
                 </Typography>
                 <Typography variant="h6">
                   <span>Contact:</span> {Add1.contact}
@@ -1241,7 +1258,8 @@ const CreatePage = () => {
                       </Grid>
                     </Grid>
                     <Typography variant="h6">
-                      Total Cost: ${quote.totalCost = calculateTotalForQuote(quote)}
+                      Total Cost: $
+                      {(quote.totalCost = calculateTotalForQuote(quote))}
                     </Typography>
                   </>
                 )}

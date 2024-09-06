@@ -8,7 +8,7 @@ import { NextPage } from 'next';
 
 const MyApp: NextPage<AppProps> = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
-  const publicPaths = ["/login", "/register",  "/otp", "/verify-email", "/verified"]; // Add public routes here
+  const publicPaths = ["/login", "/register",  "/otp", "/verify-email", "/verified", "/"]; // Add public routes here
   const isPublicPage = publicPaths.includes(router.pathname);
 
   const ProtectedComponent = isPublicPage ? Component : withAuth(Component);

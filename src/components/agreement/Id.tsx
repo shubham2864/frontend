@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -16,21 +16,50 @@ import {
 import EmailIcon from "@mui/icons-material/Email";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LinkIcon from '@mui/icons-material/Link';
+import LinkIcon from "@mui/icons-material/Link";
+import styles from "../../styles/Agreement.module.css";
+import { useRouter } from "next/router";
+import axios from "axios";
+import { AgreementDetails } from "@/types/types";
 
 const AgreementPage = () => {
   const [tabIndex, setTabIndex] = useState(0);
+  const router = useRouter();
+  const { id } = router.query; // Get the ID from the route
+  const [agreementDetails, setAgreementDetails] = useState<AgreementDetails | null>(null);
+  const [transactionTab, setTransactionTab] = useState(0);
 
-  const handleTabChange = (event:any, newValue:any) => {
+  const handleTabChange = (event: any, newValue: any) => {
     setTabIndex(newValue);
   };
+
+  const handleTransactionTab = (event: any, newValue: any) => {
+    setTransactionTab(newValue);
+  };
+
+  useEffect(() => {
+    if (id) {
+      // Fetch the agreement details from the backend
+      console.log(id)
+      axios
+        .get(`http://localhost:3001/agreement/${id}`)
+        .then((response) => {
+          setAgreementDetails(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching agreement details", error);
+        });
+    }
+    console.log(agreementDetails)
+  }, [id]);
+
+  if (!agreementDetails) return <div>Loading...</div>;
 
   return (
     <div
       style={{
         width: "80%",
         margin: "auto",
-        padding: 2,
         display: "flex",
         flexDirection: "column",
       }}
@@ -40,7 +69,6 @@ const AgreementPage = () => {
         sx={{
           width: "80%",
           margin: "auto",
-          padding: 2,
           display: "flex",
           flexDirection: "column",
           gap: 2,
@@ -56,9 +84,9 @@ const AgreementPage = () => {
         >
           <Typography variant="h6">
             <IconButton sx={{ alignSelf: "flex-start" }}>
-              <ArrowBackIcon />
+              <ArrowBackIcon onClick={() => router.push("/dashboard")}/>
             </IconButton>
-            Shubham Jain
+            {agreementDetails?.Add1.firstName || "Loading..."} {agreementDetails?.Add1.lastName}
             <Chip
               label="Payment Due"
               color="primary"
@@ -95,7 +123,7 @@ const AgreementPage = () => {
           flexDirection: "column",
           gap: 2,
           borderRadius: "8px",
-          mt: 1, 
+          mt: 1,
         }}
       >
         <Box
@@ -112,10 +140,10 @@ const AgreementPage = () => {
             <EmailIcon fontSize="small" />
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Typography variant="body2">
-                Email payment link to Shubham Jain
+                Email payment link to {agreementDetails?.Add1.firstName || "Loading..."} {agreementDetails?.Add1.lastName}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                shubhamjain0176@gmail.com
+                {agreementDetails!.Add1.email}
               </Typography>
             </Box>
           </Box>
@@ -151,13 +179,13 @@ const AgreementPage = () => {
             Gross premium
           </Typography>
           <Typography variant="h6" sx={{ marginTop: 0.5 }}>
-            $5,041.00
+            ${agreementDetails.quotes[0].totalCost}
           </Typography>
         </Box>
       </Box>
 
       {/* Cards Section */}
-      <Grid container spacing={2} sx={{ mt: 2, width: "80%", margin: "auto" }}>
+      <Grid container spacing={2} sx={{ mt: 0, width: "80%", margin: "auto" }}>
         <Grid item xs={12} md={8}>
           {/* Financed Details Card */}
           <Card
@@ -168,12 +196,33 @@ const AgreementPage = () => {
             }}
           >
             <CardContent>
-              <Typography variant="body1" color="textPrimary">
+              <Typography
+                variant="body1"
+                color="textPrimary"
+                sx={{ fontWeight: "bold", display: "flex" }}
+              >
                 Financed
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    textAlign: "center",
+                    bgcolor: "#ccfbf1",
+                    borderRadius: 1,
+                    cursor: "pointer",
+                    marginLeft: "5px",
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ marginTop: "2px" }}
+                  >
+                    Available Until Sep 05, 2024
+                  </Typography>
+                </Box>
               </Typography>
-              <Typography variant="body2" color="textSecondary">
-                Available Until Sep 05, 2024
-              </Typography>
+
               <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" color="textSecondary">
                   Date: Sep 05, 2024, 06:40 PM
@@ -215,6 +264,23 @@ const AgreementPage = () => {
                   Generate Loan Agreement PDF
                 </Typography>
               </Box>
+
+              <hr style={{ borderTop: "1px #ccc", marginTop: "10px" }} />
+              <Typography
+                variant="body1"
+                color="textPrimary"
+                sx={{ fontWeight: "bold", display: "flex" }}
+              >
+                Pay In-Full
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2" color="textSecondary">
+                  Card transaction fees : $176.73
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  ACH transaction fees : $0.00
+                </Typography>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -226,10 +292,15 @@ const AgreementPage = () => {
               borderRadius: "12px",
               boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
               padding: 2,
+              height: "370px",
             }}
           >
             <CardContent>
-              <Typography variant="body1" color="textPrimary">
+              <Typography
+                variant="body1"
+                color="textPrimary"
+                sx={{ fontWeight: "bold" }}
+              >
                 Related Details
               </Typography>
 
@@ -253,13 +324,17 @@ const AgreementPage = () => {
                 {tabIndex === 0 && (
                   <Box>
                     <Typography variant="h6" sx={{ mt: 1 }}>
-                      Shubham Jain
+                    {agreementDetails?.Add1.firstName || "Loading..."} {agreementDetails?.Add1.lastName}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      shubhamjain0176@gmail.com
+                      {agreementDetails.Add1.email}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                      +1 (545) 454-5452
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      sx={{ mt: 1 }}
+                    >
+                      {agreementDetails.Add1.contact}
                     </Typography>
                     <Button variant="outlined" color="primary" sx={{ mt: 2 }}>
                       Edit Contact Details
@@ -300,6 +375,154 @@ const AgreementPage = () => {
           </Card>
         </Grid>
       </Grid>
+
+      <Card
+        sx={{
+          width: "77%",
+          margin: "auto",
+          padding: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          borderRadius: "8px",
+          mt: 1,
+          marginTop: "30px"
+        }}
+      >
+        <CardContent sx={{ padding: 0 }}>
+          <Typography variant="h6" sx={{ padding: 2 }}>
+            Transactions
+          </Typography>
+          <Tabs
+            value={transactionTab}
+            onChange={handleTransactionTab}
+            indicatorColor="primary"
+            textColor="primary"
+            sx={{ padding: "0 16px" }}
+          >
+            <Tab label="Customer" />
+            <Tab label="Insurance" />
+            <Tab label="Carrier/ Wholesaler" />
+          </Tabs>
+          <Divider />
+          <Box sx={{ overflowX: "auto", padding: 2 }}>
+            <table className={styles.transactionTable}>
+              {transactionTab ===0 && (
+                <>
+                <thead>
+                <tr>
+                  <th>TRANSACTION</th>
+                  <th>PAYMENT</th>
+                  <th>STATUS</th>
+                  <th>DUE ON</th>
+                  <th>PROCESSED ON</th>
+                  <th>PAID ON</th>
+                  <th>PAYMENT METHOD</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              </>
+              )}
+              {transactionTab === 1 && (
+                <>
+                <thead>
+                <tr>
+                  <th>TRANSACTION</th>
+                  <th>AMOUNT RECEIVED</th>
+                  <th>STATUS</th>
+                  <th>SENT ON</th>
+                  <th>CLEARED ON</th>
+                  <th>PAID ON</th>
+                  <th>ACCOUNT</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              </>
+              )}
+              {transactionTab ===2 && (
+                <>
+                <thead>
+                <tr>
+                  <th>TRANSACTION</th>
+                  <th>AMOUNT RECEIVED</th>
+                  <th>STATUS</th>
+                  <th>SENT ON</th>
+                  <th>CLEARED ON</th>
+                  <th>ACCOUNT</th>
+                </tr>
+              </thead>
+              <tbody style={{margin: "auto", padding: "20px"}}>
+                No Data Found
+              </tbody>
+              </>
+              )}
+            </table>
+          </Box>
+        </CardContent>
+      </Card>
+
+      <Card
+        sx={{
+          width: "77%",
+          margin: "auto",
+          padding: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          borderRadius: "8px",
+          mt: 0,
+          marginTop: "30px"
+        }}
+      >
+        <CardContent sx={{ padding: 0 }}>
+          <Typography variant="h6" sx={{ padding: 2 }}>
+          Policies
+          </Typography>
+          <Box sx={{ overflowX: "auto", padding: 2 }}>
+            <table className={styles.policies} >
+                <thead>
+                <tr>
+                  <th>TRANSACTION</th>
+                  <th>AMOUNT RECEIVED</th>
+                  <th>STATUS</th>
+                  <th>SENT ON</th>
+                  <th>CLEARED ON</th>
+                  <th>ACCOUNT</th>
+                </tr>
+              </thead>
+              <hr style={{ borderTop: "1px #ccc", marginTop: "0px" }} />
+              <tbody style={{margin: "auto", padding: "20px"}}>
+                No Data Found
+              </tbody>
+              <hr style={{ borderTop: "1px #ccc", marginTop: "10px" }} />
+            </table>
+          </Box>
+        </CardContent>
+      </Card>
+
+      <Card
+        sx={{
+          width: "77%",
+          margin: "auto",
+          padding: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          borderRadius: "8px",
+          mt: 0,
+          marginBottom: "30px",
+          marginTop: "30px"
+        }}
+      >
+        <CardContent sx={{ padding: 0 }}>
+          <Typography variant="h6" sx={{ padding: 2 }}>
+          Communication
+          </Typography>
+          <Typography variant="h6" sx={{ padding: 2, alignContent: "center", textAlign: "center" }}>
+          No communication has been sent yet
+          </Typography>
+        </CardContent>
+      </Card>
     </div>
   );
 };
