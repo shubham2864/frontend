@@ -379,3 +379,34 @@ export const sendApprovalRequest = async (formData: any) => {
     throw error;
   }
 };
+
+export const getAgreementByEmail = async (email: string) => {
+  try {
+    const response = await api.get(`/agreement/${email}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching agreement by email", error);
+    throw error;
+  }
+};
+
+export const sendTemplateEmail = async (id: any) => {
+  try {
+    const response = await api.post(`/agreement/templateEmail/${id}`);
+    alert("email sent successfully!!!")
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching agreement by email", error);
+    throw error;
+  }
+};
+
+export const fetchAgreementData = async (userId: string) => {
+  try {
+    const response = await api.get(`/agreement/id/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+};

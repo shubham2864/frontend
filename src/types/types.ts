@@ -18,6 +18,29 @@ export interface Company {
   companyName: string;
   businessOwner: BusinessOwner[];
 }
+
+
+export interface Quote {
+  quoteNumber: string;
+  policyNumber: string;
+  carrierCompany: string;
+  wholesaler: string;
+  coverage: string;
+  effectiveDate: string;
+  expirationDate: string;
+  minDaysToCancel: number;
+  minEarnedRate: number;
+  premium: number;
+  taxes: number;
+  otherFees: number;
+  brokerFee: number;
+  policyFee: number;
+  commission: number;
+  agencyFees: number;
+  file: File | null;
+  totalCost: number;
+}
+
 export interface Add1Error {
   email: string;
   firstname: string;

@@ -19,6 +19,8 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  FormHelperText,
+  Divider,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import styles from "../styles/CreatePage.module.css"; // Import the CSS module
@@ -27,27 +29,8 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-
-interface Quote {
-  quoteNumber: string;
-  policyNumber: string;
-  carrierCompany: string;
-  wholesaler: string;
-  coverage: string;
-  effectiveDate: string;
-  expirationDate: string;
-  minDaysToCancel: number;
-  minEarnedRate: number;
-  premium: number;
-  taxes: number;
-  otherFees: number;
-  brokerFee: number;
-  policyFee: number;
-  commission: number;
-  agencyFees: number;
-  file: File | null;
-  totalCost: number;
-}
+import { getAgreementByEmail } from "@/services/api";
+import { Quote } from "@/types/types";
 
 const CreatePage = () => {
   const [Add1, setAdd1] = useState({
@@ -62,6 +45,14 @@ const CreatePage = () => {
   });
   const router = useRouter();
   const [selectedValue, setSelectedValue] = useState<string>("");
+  const currentDate = new Date();
+  const effectiveDateDefault = currentDate.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+
+  const expirationDateDefault = new Date(
+    currentDate.setFullYear(currentDate.getFullYear() + 1)
+  )
+    .toISOString()
+    .split("T")[0]; // Format: YYYY-MM-DD
   const [Add2, setAdd2] = useState([
     {
       BuisnessName: "",
@@ -79,9 +70,9 @@ const CreatePage = () => {
       carrierCompany: "",
       wholesaler: "",
       coverage: "",
-      effectiveDate: "",
-      expirationDate: "",
-      minDaysToCancel: 0,
+      effectiveDate: effectiveDateDefault,
+      expirationDate: expirationDateDefault,
+      minDaysToCancel: 10,
       minEarnedRate: 0,
       premium: 0,
       taxes: 0,
@@ -113,13 +104,39 @@ const CreatePage = () => {
       state: "",
       zip: "",
     },
-    Add2: Add2.map(() => ({
-      BuisnessName: "",
-      Address: "",
-      Address2: "",
-      city: "",
-      state: "",
-      Zip: "",
+    Add2:
+      Add2.length > 0
+        ? Add2.map(() => ({
+            BuisnessName: "",
+            Address: "",
+            Address2: "",
+            city: "",
+            state: "",
+            Zip: "",
+          }))
+        : [],
+  });
+
+  const [quotesErrors, setQuotesErrors] = useState<{ quotes: any[] }>({
+    quotes: quotes.map(() => ({
+      quoteNumber: "",
+      policyNumber: "",
+      carrierCompany: "",
+      wholesaler: "",
+      coverage: "",
+      effectiveDate: "",
+      expirationDate: "",
+      minDaysToCancel: "",
+      minEarnedRate: "",
+      premium: "",
+      taxes: "",
+      otherFees: "",
+      brokerFee: "",
+      policyFee: "",
+      commission: "",
+      agencyFees: "",
+      file: "",
+      totalCost: "",
     })),
   });
 
@@ -163,6 +180,7 @@ const CreatePage = () => {
 
     setErrors((prevErrors) => {
       const currentErrors = prevErrors || { Add1: {}, Add2: [] };
+
       return {
         ...currentErrors,
         Add2: [
@@ -203,6 +221,34 @@ const CreatePage = () => {
       return;
     }
 
+    try {
+      // If the email is valid, call the backend to check if email exists
+      const response = await getAgreementByEmail(Add1.email);
+      if (response) {
+        // Set the data (response data) if the email exists
+        console.log(response);
+        setAdd1(response.Add1);
+        if (response.Add2) {
+          setCustomerType("commercial");
+          setAdd2(response.Add2 || []);
+        }
+        setEmailError(""); // Clear error if found
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      } else {
+        console.log("no data found");
+        setEmailError("No record found for this email");
+      }
+    } catch (error: any) {
+      console.error("Error fetching email data", error);
+      if (error.response?.status === 404) {
+        setEmailError("No record found for this email");
+      } else if (error.response?.status === 400) {
+        setEmailError("Invalid email format");
+      } else {
+        setEmailError("An error occurred while checking the email");
+      }
+    }
+
     // If the email is valid, clear the error and set autocomplete as complete
     setEmailError("");
     setIsAutocompleteComplete(true);
@@ -219,6 +265,7 @@ const CreatePage = () => {
       const updatedQuotes = [...prevQuotes];
       let newValue;
 
+      // Handle numeric fields
       switch (name) {
         case "minDaysToCancel":
         case "minEarnedRate":
@@ -235,15 +282,51 @@ const CreatePage = () => {
           newValue = value;
       }
 
-      updatedQuotes[index] = { ...updatedQuotes[index], [name]: newValue };
+      // If the effectiveDate is updated, calculate and set expirationDate
+      if (name === "effectiveDate") {
+        const effectiveDate = new Date(value); // Parse the effective date
+        const expirationDate = new Date(effectiveDate); // Copy the effective date
+        expirationDate.setFullYear(effectiveDate.getFullYear() + 1); // Set expiration date to 1 year later
+
+        updatedQuotes[index] = {
+          ...updatedQuotes[index],
+          [name]: newValue, // Set the new effectiveDate
+          expirationDate: expirationDate.toISOString().split("T")[0], // Set expirationDate to one year after
+        };
+      } else {
+        updatedQuotes[index] = { ...updatedQuotes[index], [name]: newValue };
+      }
+
       return updatedQuotes;
     });
 
     console.log(quotes);
   };
 
-  const handleFileChange = (index: any, event: any) => {
-    const file = event.target.files[0];
+  // Handle quote field change
+  // const handleQuoteChange = (index: any, e: any) => {
+  //   const { name, value } = e.target;
+  //   const updatedQuotes = [...quotes];
+  //   updatedQuotes[index] = { ...updatedQuotes[index], [name]: value };
+
+  //   // If effectiveDate changes, update expirationDate to one year after
+  //   if (name === "effectiveDate") {
+  //     const effectiveDate = new Date(value);
+  //     const expirationDate = new Date(effectiveDate);
+  //     expirationDate.setFullYear(effectiveDate.getFullYear() + 1);
+  //     updatedQuotes[index].expirationDate = expirationDate
+  //       .toISOString()
+  //       .split("T")[0];
+  //   }
+
+  //   setQuotes(updatedQuotes);
+  // };
+
+  const handleFileChange = (
+    index: any,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0] || null;
     setQuotes((prevQuotes) => {
       const updatedQuotes = [...prevQuotes];
       updatedQuotes[index] = { ...updatedQuotes[index], file };
@@ -260,9 +343,9 @@ const CreatePage = () => {
         carrierCompany: "",
         wholesaler: "",
         coverage: "",
-        effectiveDate: "",
-        expirationDate: "",
-        minDaysToCancel: 0,
+        effectiveDate: effectiveDateDefault,
+        expirationDate: expirationDateDefault,
+        minDaysToCancel: 10,
         minEarnedRate: 0,
         premium: 0,
         taxes: 0,
@@ -275,13 +358,66 @@ const CreatePage = () => {
         totalCost: 0,
       },
     ]);
+    // Add corresponding errors for the new quote
+    setQuotesErrors({
+      quotes: [
+        ...quotesErrors.quotes,
+        {
+          quoteNumber: "",
+          policyNumber: "",
+          carrierCompany: "",
+          wholesaler: "",
+          coverage: "",
+          effectiveDate: "",
+          expirationDate: "",
+          minDaysToCancel: "",
+          minEarnedRate: "",
+          premium: "",
+          taxes: "",
+          otherFees: "",
+          brokerFee: "",
+          policyFee: "",
+          commission: "",
+          agencyFees: "",
+          file: "",
+          totalCost: "",
+        },
+      ],
+    });
   };
 
   const isStepComplete = (step: number) => {
     let hasError = false;
-    const newErrors = { Add1: { ...errors.Add1 }, Add2: { ...errors.Add2 } };
+    const newErrors = {
+      Add1: { ...errors.Add1 },
+      Add2:
+        errors.Add2.length > 0
+          ? errors.Add2.map((error) => ({ ...error }))
+          : [],
+      quotes: quotes.map(() => ({
+        quoteNumber: "",
+        policyNumber: "",
+        carrierCompany: "",
+        wholesaler: "",
+        coverage: "",
+        effectiveDate: "",
+        expirationDate: "",
+        minDaysToCancel: "",
+        minEarnedRate: "",
+        premium: "",
+        taxes: "",
+        otherFees: "",
+        brokerFee: "",
+        policyFee: "",
+        commission: "",
+        agencyFees: "",
+        file: "",
+        totalCost: "",
+      })),
+    };
 
-    // Validate Add1
+    console.log(newErrors);
+    // Validate Add1 including the "state" dropdown
     if (step === 0) {
       Object.keys(Add1).forEach((key) => {
         if (!Add1[key as keyof typeof Add1]) {
@@ -291,11 +427,38 @@ const CreatePage = () => {
           newErrors.Add1[key as keyof typeof Add1] = "";
         }
       });
+
+      // Specific validation for the "state" field (dropdown)
+      if (!Add1.state) {
+        newErrors.Add1.state = "State is required";
+        hasError = true;
+      } else {
+        newErrors.Add1.state = "";
+      }
+
+      if (!Add1.contact || Add1.contact.length < 10) {
+        newErrors.Add1.contact = "Valid contact number is required";
+        hasError = true;
+      } else {
+        newErrors.Add1.contact = "";
+      }
     }
 
-    // Validate Add2 if "commercial" customer type is selected
+    // Validate Add2 for "commercial" customer type
     if (customerType === "commercial") {
       Add2.forEach((business, index) => {
+        // Ensure Add2[index] exists in newErrors
+        if (!newErrors.Add2[index]) {
+          newErrors.Add2[index] = {
+            BuisnessName: "",
+            Address: "",
+            Address2: "",
+            city: "",
+            state: "",
+            Zip: "",
+          };
+        }
+
         Object.keys(business).forEach((key) => {
           if (!business[key as keyof typeof business]) {
             newErrors.Add2[index][
@@ -309,15 +472,63 @@ const CreatePage = () => {
       });
     }
 
+    if (step === 1) {
+      quotes.forEach((quote, index) => {
+        // Validate all fields for each quote
+        Object.keys(quote).forEach((key) => {
+          if (key === "totalCost") {
+            // Skip validation for totalCost
+            return;
+          }
+
+          if (!quote[key as keyof typeof quote] && key !== "file") {
+            newErrors.quotes[index][
+              key as keyof typeof quote
+            ] = `${key} is required`;
+            hasError = true;
+          }
+        });
+
+        // File validation
+        if (!quote.file) {
+          newErrors.quotes[index].file = "File is required";
+          hasError = true;
+        }
+
+        if (quote.premium < 250) {
+          newErrors.quotes[index].premium = "premium must be greater than 250";
+          hasError = true;
+        }
+
+        if (quote.minEarnedRate >= 100) {
+          newErrors.quotes[index].minEarnedRate =
+            "Agreement is not financeable with a minimum earned rate of 100%";
+          hasError = true;
+        }
+      });
+    }
+
     setErrors(newErrors);
+    setQuotesErrors(newErrors);
     return !hasError;
   };
 
   const removeQuote = (index: any) => {
     if (quotes.length > 1) {
-      setQuotes((prevQuotes) => prevQuotes.filter((_, i) => i !== index));
+      const updatedQuotes = quotes.filter((_, i) => i !== index);
+      const updatedErrors = quotesErrors.quotes.filter((_, i) => i !== index);
+      setQuotes(updatedQuotes);
+      setQuotesErrors({ quotes: updatedErrors });
     }
   };
+
+  // // Remove a quote
+  // const removeQuote = (index: number) => {
+  //   const updatedQuotes = quotes.filter((_, i) => i !== index);
+  //   const updatedErrors = quotesErrors.quotes.filter((_, i) => i !== index);
+  //   setQuotes(updatedQuotes);
+  //   setQuotesErrors({ quotes: updatedErrors });
+  // };
 
   const emptyQuoteTemplate: Quote = {
     quoteNumber: "",
@@ -363,8 +574,8 @@ const CreatePage = () => {
     }
 
     if (activeStep === steps.length - 1) {
-      console.log({ Add2 });
       try {
+        console.log(quotes, "shubha, 456");
         const response = await axios.post(
           "http://localhost:3001/agreement",
           { Add1, Add2, quotes },
@@ -532,7 +743,12 @@ const CreatePage = () => {
                 />
               </Grid>
               <Grid item xs={12} md={4}>
-                <FormControl fullWidth margin="normal" variant="outlined">
+                <FormControl
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  error={!!errors.Add1?.state}
+                >
                   <InputLabel id="state-label">State</InputLabel>
                   <Select
                     labelId="state-label"
@@ -546,6 +762,9 @@ const CreatePage = () => {
                     <MenuItem value="Delhi">Delhi</MenuItem>
                     {/* Add more states as needed */}
                   </Select>
+                  {errors.Add1?.state && (
+                    <FormHelperText>{errors.Add1.state}</FormHelperText>
+                  )}
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={4}>
@@ -564,15 +783,18 @@ const CreatePage = () => {
               </Grid>
             </Grid>
             <PhoneInput
-              country={"us"} // Set a default country code
-              value={Add1.contact} // Bind the contact state here
-              onChange={handleContactChange} // Handle changes from the phone input
+              country={"us"}
+              value={Add1.contact}
+              onChange={handleContactChange}
               inputProps={{
                 name: "contact",
                 required: true,
                 autoFocus: true,
               }}
             />
+            {errors.Add1?.contact && (
+              <FormHelperText>{errors.Add1.contact}</FormHelperText>
+            )}
             {/* {errors.contact && <p style={{ color: "red" }}>{errors.contact}</p>} */}
             <FormControl component="fieldset" margin="normal">
               <RadioGroup
@@ -597,7 +819,7 @@ const CreatePage = () => {
                 <div key={index} className={styles.businessForm}>
                   <Typography variant="h6" className={styles.heading3}>
                     <div className={styles.quoteHeader}>
-                      Busuiness Form {index + 1}
+                      Business Form {index + 1}
                       <IconButton
                         onClick={() => removeBusiness(index)}
                         className={styles.deleteButton}
@@ -619,8 +841,8 @@ const CreatePage = () => {
                     fullWidth
                     margin="normal"
                     variant="outlined"
-                    error={!!errors.Add2[index].BuisnessName}
-                    helperText={errors.Add2[index].BuisnessName}
+                    error={!!errors?.Add2?.[index]?.BuisnessName}
+                    helperText={errors?.Add2?.[index]?.BuisnessName}
                   />
                   <TextField
                     name="Address"
@@ -635,8 +857,8 @@ const CreatePage = () => {
                     fullWidth
                     margin="normal"
                     variant="outlined"
-                    error={!!errors.Add2[index].Address}
-                    helperText={errors.Add2[index].Address}
+                    error={!!errors?.Add2?.[index]?.Address}
+                    helperText={errors?.Add2?.[index]?.Address}
                   />
                   <TextField
                     name="Address2"
@@ -667,8 +889,8 @@ const CreatePage = () => {
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        error={!!errors.Add2[index].city}
-                        helperText={errors.Add2[index].city}
+                        error={!!errors?.Add2?.[index]?.city}
+                        helperText={errors?.Add2?.[index]?.city}
                       />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -685,8 +907,8 @@ const CreatePage = () => {
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        error={!!errors.Add2[index].state}
-                        helperText={errors.Add2[index].state}
+                        error={!!errors?.Add2?.[index]?.state}
+                        helperText={errors?.Add2?.[index]?.state}
                       />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -703,8 +925,8 @@ const CreatePage = () => {
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        error={!!errors.Add2[index].Zip}
-                        helperText={errors.Add2[index].Zip}
+                        error={!!errors?.Add2?.[index]?.Zip}
+                        helperText={errors?.Add2?.[index]?.Zip}
                       />
                     </Grid>
                   </Grid>
@@ -790,6 +1012,11 @@ const CreatePage = () => {
                       </Typography>
                     )}
                   </Button>
+                  {quotesErrors.quotes[index]?.file && (
+                    <Typography color="error">
+                      {quotesErrors.quotes[index].file}
+                    </Typography>
+                  )}
                   {quote.file && (
                     <>
                       <Grid container spacing={2}>
@@ -802,6 +1029,12 @@ const CreatePage = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
+                            error={!!quotesErrors.quotes[index]?.quoteNumber}
+                            helperText={
+                              quotesErrors.quotes[index]?.quoteNumber
+                                ? "Quote Number is required"
+                                : ""
+                            }
                           />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -813,6 +1046,12 @@ const CreatePage = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
+                            error={!!quotesErrors.quotes[index]?.policyNumber}
+                            helperText={
+                              quotesErrors.quotes[index]?.policyNumber
+                                ? "Policy Number is required"
+                                : ""
+                            }
                           />
                         </Grid>
                       </Grid>
@@ -826,6 +1065,12 @@ const CreatePage = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
+                            error={!!quotesErrors.quotes[index]?.carrierCompany}
+                            helperText={
+                              quotesErrors.quotes[index]?.carrierCompany
+                                ? "Carrier Company is required"
+                                : ""
+                            }
                           />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -837,18 +1082,11 @@ const CreatePage = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
+                            error={!!quotesErrors.quotes[index]?.wholesaler}
+                            helperText={quotesErrors.quotes[index]?.wholesaler}
                           />
                         </Grid>
                       </Grid>
-                      <TextField
-                        name="coverage"
-                        label="Coverage"
-                        value={quote.coverage}
-                        onChange={(e) => handleQuoteChange(index, e)}
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                      />
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
                           <TextField
@@ -881,6 +1119,21 @@ const CreatePage = () => {
                           />
                         </Grid>
                       </Grid>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            name="coverage"
+                            label="Coverage"
+                            value={quote.coverage}
+                            onChange={(e) => handleQuoteChange(index, e)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                            error={!!quotesErrors.quotes[index]?.coverage}
+                            helperText={quotesErrors.quotes[index]?.coverage}
+                          />
+                        </Grid>
+                      </Grid>
                       <Typography className={styles.heading4}>
                         Provided by carrier
                       </Typography>
@@ -895,6 +1148,14 @@ const CreatePage = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
+                            error={
+                              !!quotesErrors.quotes[index]?.minDaysToCancel
+                            }
+                            helperText={
+                              quotesErrors.quotes[index]?.minDaysToCancel
+                                ? "Minimum Days to Cancel is required"
+                                : ""
+                            }
                           />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -907,6 +1168,10 @@ const CreatePage = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
+                            error={!!quotesErrors.quotes[index]?.minEarnedRate}
+                            helperText={
+                              quotesErrors.quotes[index]?.minEarnedRate
+                            }
                           />
                         </Grid>
                       </Grid>
@@ -924,6 +1189,8 @@ const CreatePage = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
+                            error={!!quotesErrors.quotes[index]?.premium}
+                            helperText={quotesErrors.quotes[index]?.premium}
                           />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -994,6 +1261,8 @@ const CreatePage = () => {
                             fullWidth
                             margin="normal"
                             variant="outlined"
+                            error={!!quotesErrors.quotes[index]?.commission}
+                            helperText={quotesErrors.quotes[index]?.commission}
                           />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -1026,244 +1295,136 @@ const CreatePage = () => {
           </div>
         )}
         {activeStep === 2 && (
-          <div className={styles.step2Container}>
-            <Typography variant="h4" className={styles.step2Header}>
-              Review Your Details:
-            </Typography>
-            <Grid container spacing={2} className={styles.step2Grid}>
-              <Grid item xs={12} md={6} className={styles.step2Group}>
-                <Typography variant="h6">
-                  <span>Email:</span> {Add1.email}
-                </Typography>
-                <Typography variant="h6">
-                  <span>First Name:</span> {Add1.firstName}
-                </Typography>
-                <Typography variant="h6">
-                  <span>Last Name:</span> {Add1.lastName}
-                </Typography>
-                <Typography variant="h6">
-                  <span>Address:</span> {Add1.address}
-                </Typography>
-                <Typography variant="h6">
-                  <span>City:</span> {Add1.city}
-                </Typography>
-                <Typography variant="h6">
-                  <span>State:</span> {Add1.state}
-                </Typography>
-                <Typography variant="h6">
-                  <span>Zip:</span> {Add1.zip}
-                </Typography>
-                <Typography variant="h6">
-                  <span>Contact:</span> {Add1.contact}
-                </Typography>
-              </Grid>
-            </Grid>
-            <FormControl component="fieldset" margin="normal">
-              <RadioGroup value={customerType}>
-                {customerType === "personal" ? (
-                  <FormControlLabel
-                    value="personal"
-                    control={<Radio />}
-                    label="Personal Customer"
-                  />
-                ) : (
-                  <>
-                    <FormControlLabel
-                      value="commercial"
-                      control={<Radio />}
-                      label="Commercial Customer"
-                    />
-                    <Box mt={2}>
-                      {Add2.map((business, index) => (
-                        <Box key={index} className={styles.step2QuoteContainer}>
-                          <Typography
-                            variant="h5"
-                            className={styles.step2QuoteHeader}
-                          >
-                            Business Form {index + 1} :
-                          </Typography>
-                          <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                              <Typography variant="body1">
-                                <strong>Business Name:</strong>{" "}
-                                {business.BuisnessName}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body1">
-                                <strong>Lane Address:</strong>{" "}
-                                {business.Address}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body1">
-                                <strong>Lane Address2:</strong>{" "}
-                                {business.Address2}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                              <Typography variant="body1">
-                                <strong>City:</strong> {business.city}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                              <Typography variant="body1">
-                                <strong>State:</strong> {business.state}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body1">
-                                <strong>Zip Code:</strong> {business.Zip}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </Box>
-                      ))}
-                    </Box>
-                  </>
-                )}
-              </RadioGroup>
-            </FormControl>
-            <Typography>
-              -- Person that will act on behalf of the customer or business and
-              be listed as the signee :
-            </Typography>
-            <FormControl component="fieldset" margin="normal">
-              <RadioGroup row value={selectedValue}>
-                <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-                <FormControlLabel value="no" control={<Radio />} label="No" />
-              </RadioGroup>
-            </FormControl>
+          <div>
             {quotes.map((quote, index) => (
-              <Container key={index} className={styles.step2QuoteContainer}>
-                <Typography variant="h5" className={styles.step2QuoteHeader}>
+              <Box
+                key={index}
+                p={4}
+                sx={{
+                  maxWidth: "800px",
+                  marginTop: "10px",
+                  backgroundColor: "#f9fafb",
+                  borderRadius: "8px",
+                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+                  mb: 4,
+                }}
+              >
+                {/* Quote Information */}
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{ marginBottom: "30px" }}
+                >
                   Quote {index + 1}
                 </Typography>
-                <Typography variant="h5" style={{ color: "black" }}>
-                  Attached documents :
+
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Quote number
+                    </Typography>
+                    <Typography>{quote.quoteNumber}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Policy number
+                    </Typography>
+                    <Typography>{quote.policyNumber}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Carrier / Writing company
+                    </Typography>
+                    <Typography>{quote.carrierCompany}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Coverage
+                    </Typography>
+                    <Typography>{quote.coverage}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Effective Date
+                    </Typography>
+                    <Typography>{quote.effectiveDate}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Expiration Date
+                    </Typography>
+                    <Typography>{quote.expirationDate}</Typography>
+                  </Grid>
+                </Grid>
+
+                <Divider sx={{ my: 3 }} />
+
+                {/* Provided by Carrier */}
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography variant="h6" gutterBottom>
+                      Provided by carrier
+                    </Typography>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Minimum days to cancel
+                      </Typography>
+                      <Typography>{quote.minDaysToCancel}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Minimum earned rate
+                      </Typography>
+                      <Typography>{quote.minEarnedRate}</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="h6" gutterBottom>
+                      Financeable
+                    </Typography>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Premium
+                      </Typography>
+                      <Typography>{quote.premium}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Taxes
+                      </Typography>
+                      <Typography>{quote.taxes}</Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+
+                <Divider sx={{ my: 3 }} />
+
+                {/* Not Financeable */}
+                <Typography variant="h6" gutterBottom>
+                  Not financeable
                 </Typography>
-                {quote.file && (
-                  <>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Quote Number : </strong> {quote.quoteNumber}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Policy Number : </strong> {quote.policyNumber}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Carrier Company : </strong>{" "}
-                          {quote.carrierCompany}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Wholesaler : </strong> {quote.wholesaler}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Coverage : </strong> {quote.coverage}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Effective Date : </strong>{" "}
-                          {quote.effectiveDate}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Expiration Date : </strong>{" "}
-                          {quote.expirationDate}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Typography fontSize={"20px"} color={"#007bff"}>
-                      <strong>Provided by carrier :</strong>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Other fees
                     </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Minimum Days to Cancel : </strong>{" "}
-                          {quote.minDaysToCancel}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Minimum Earned Rate : </strong>{" "}
-                          {quote.minEarnedRate}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Typography fontSize={"20px"} color={"#007bff"}>
-                      <strong>Financeable : </strong>
+                    <Typography>{quote.otherFees}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Broker / Wholesaler fee
                     </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Premium : </strong> {quote.premium}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Taxes : </strong> {quote.taxes}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Typography fontSize={"20px"} color={"#007bff"}>
-                      <strong>Non Financeable : </strong>
+                    <Typography>{quote.brokerFee}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Policy fee
                     </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body1">
-                          <strong>Other Fees : </strong> {quote.otherFees}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body1">
-                          <strong>Broker Fee : </strong> {quote.brokerFee}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body1">
-                          <strong>Policy Fee : </strong> {quote.policyFee}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Typography fontSize={"20px"} color={"#007bff"}>
-                      <strong>Payment Distribution : </strong>
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Comission : </strong> {quote.commission}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="body1">
-                          <strong>Agency Fees : </strong> {quote.agencyFees}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Typography variant="h6">
-                      Total Cost: $
-                      {(quote.totalCost = calculateTotalForQuote(quote))}
-                    </Typography>
-                  </>
-                )}
-              </Container>
+                    <Typography>{quote.policyFee}</Typography>
+                  </Grid>
+                </Grid>
+                <Divider sx={{ my: 3 }} />
+                <Typography variant="h6">
+                  Total Cost: $
+                  {(quote.totalCost = calculateTotalForQuote(quote))}
+                </Typography>
+              </Box>
             ))}
           </div>
         )}

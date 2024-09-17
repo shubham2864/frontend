@@ -15,13 +15,12 @@ const withAuth = <P extends object>(WrappedComponent: NextPage<P>) => {
     }, [authChecked, isAuthenticated, router]);
 
     if (!authChecked) {
-      return null; // Optionally return a loading spinner or some placeholder
+      return null; 
     }
 
     return <WrappedComponent {...props} />;
   };
 
-  // Copy getInitialProps so it works with SSR/SSG pages
   if (WrappedComponent.getInitialProps) {
     ComponentWithAuth.getInitialProps = WrappedComponent.getInitialProps;
   }

@@ -21,13 +21,19 @@ import styles from "../../styles/Agreement.module.css";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { AgreementDetails } from "@/types/types";
+import { fetchAgreementData, sendTemplateEmail } from "@/services/api";
+import { useAuth } from "@/context/AuthContext";
+import { generatePDF } from "@/utils/pdfUtils";
 
 const AgreementPage = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const router = useRouter();
   const { id } = router.query; // Get the ID from the route
-  const [agreementDetails, setAgreementDetails] = useState<AgreementDetails | null>(null);
+  const [agreementDetails, setAgreementDetails] =
+    useState<AgreementDetails | null>(null);
   const [transactionTab, setTransactionTab] = useState(0);
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const handleTabChange = (event: any, newValue: any) => {
     setTabIndex(newValue);
@@ -37,12 +43,27 @@ const AgreementPage = () => {
     setTransactionTab(newValue);
   };
 
+  const handleGenerateAgreementPDF = async () => {
+    setLoading(true);
+    try {
+      const userId = '66db181ec843ede380c890e7'; // Example userId
+      const userData = await fetchAgreementData(userId); // Fetch data from backend
+
+      // Generate the PDF
+      await generatePDF(userData);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       // Fetch the agreement details from the backend
-      console.log(id)
+      console.log(id);
       axios
-        .get(`http://localhost:3001/agreement/${id}`)
+        .get(`http://localhost:3001/agreement/id/${id}`)
         .then((response) => {
           setAgreementDetails(response.data);
         })
@@ -50,7 +71,7 @@ const AgreementPage = () => {
           console.error("Error fetching agreement details", error);
         });
     }
-    console.log(agreementDetails)
+    console.log(agreementDetails);
   }, [id]);
 
   if (!agreementDetails) return <div>Loading...</div>;
@@ -84,13 +105,14 @@ const AgreementPage = () => {
         >
           <Typography variant="h6">
             <IconButton sx={{ alignSelf: "flex-start" }}>
-              <ArrowBackIcon onClick={() => router.push("/dashboard")}/>
+              <ArrowBackIcon onClick={() => router.push("/dashboard")} />
             </IconButton>
-            {agreementDetails?.Add1.firstName || "Loading..."} {agreementDetails?.Add1.lastName}
+            {agreementDetails?.Add1.firstName || "Loading..."}{" "}
+            {agreementDetails?.Add1.lastName}
             <Chip
               label="Payment Due"
               color="primary"
-              sx={{ bgcolor: "#cce7ff", marginLeft: "10px" }}
+              sx={{ bgcolor: "#cce7ff", marginLeft: "10px", color: "blue" }}
             />
           </Typography>
         </Box>
@@ -140,7 +162,9 @@ const AgreementPage = () => {
             <EmailIcon fontSize="small" />
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Typography variant="body2">
-                Email payment link to {agreementDetails?.Add1.firstName || "Loading..."} {agreementDetails?.Add1.lastName}
+                Email payment link to{" "}
+                {agreementDetails?.Add1.firstName || "Loading..."}{" "}
+                {agreementDetails?.Add1.lastName}
               </Typography>
               <Typography variant="body2" color="textSecondary">
                 {agreementDetails!.Add1.email}
@@ -168,7 +192,11 @@ const AgreementPage = () => {
                 </IconButton>
               </Box>
             </Tooltip>
-            <Button variant="contained" color="success">
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => sendTemplateEmail(id)}
+            >
               Send Email
             </Button>
           </Box>
@@ -253,9 +281,13 @@ const AgreementPage = () => {
                   variant="body2"
                   color="primary"
                   sx={{ textDecoration: "underline", cursor: "pointer" }}
+                  onClick={handleGenerateAgreementPDF}
                 >
-                  Generate Agreement PDF
+                  {loading
+                    ? "Generating Agreement PDF..."
+                    : "Generate Agreement PDF"}
                 </Typography>
+
                 <Typography
                   variant="body2"
                   color="primary"
@@ -324,7 +356,8 @@ const AgreementPage = () => {
                 {tabIndex === 0 && (
                   <Box>
                     <Typography variant="h6" sx={{ mt: 1 }}>
-                    {agreementDetails?.Add1.firstName || "Loading..."} {agreementDetails?.Add1.lastName}
+                      {agreementDetails?.Add1.firstName || "Loading..."}{" "}
+                      {agreementDetails?.Add1.lastName}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
                       {agreementDetails.Add1.email}
@@ -386,7 +419,7 @@ const AgreementPage = () => {
           gap: 2,
           borderRadius: "8px",
           mt: 1,
-          marginTop: "30px"
+          marginTop: "30px",
         }}
       >
         <CardContent sx={{ padding: 0 }}>
@@ -407,54 +440,54 @@ const AgreementPage = () => {
           <Divider />
           <Box sx={{ overflowX: "auto", padding: 2 }}>
             <table className={styles.transactionTable}>
-              {transactionTab ===0 && (
+              {transactionTab === 0 && (
                 <>
-                <thead>
-                <tr>
-                  <th>TRANSACTION</th>
-                  <th>PAYMENT</th>
-                  <th>STATUS</th>
-                  <th>DUE ON</th>
-                  <th>PROCESSED ON</th>
-                  <th>PAID ON</th>
-                  <th>PAYMENT METHOD</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-              </>
+                  <thead>
+                    <tr>
+                      <th>TRANSACTION</th>
+                      <th>PAYMENT</th>
+                      <th>STATUS</th>
+                      <th>DUE ON</th>
+                      <th>PROCESSED ON</th>
+                      <th>PAID ON</th>
+                      <th>PAYMENT METHOD</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </>
               )}
               {transactionTab === 1 && (
                 <>
-                <thead>
-                <tr>
-                  <th>TRANSACTION</th>
-                  <th>AMOUNT RECEIVED</th>
-                  <th>STATUS</th>
-                  <th>SENT ON</th>
-                  <th>CLEARED ON</th>
-                  <th>PAID ON</th>
-                  <th>ACCOUNT</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-              </>
+                  <thead>
+                    <tr>
+                      <th>TRANSACTION</th>
+                      <th>AMOUNT RECEIVED</th>
+                      <th>STATUS</th>
+                      <th>SENT ON</th>
+                      <th>CLEARED ON</th>
+                      <th>PAID ON</th>
+                      <th>ACCOUNT</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </>
               )}
-              {transactionTab ===2 && (
+              {transactionTab === 2 && (
                 <>
-                <thead>
-                <tr>
-                  <th>TRANSACTION</th>
-                  <th>AMOUNT RECEIVED</th>
-                  <th>STATUS</th>
-                  <th>SENT ON</th>
-                  <th>CLEARED ON</th>
-                  <th>ACCOUNT</th>
-                </tr>
-              </thead>
-              <tbody style={{margin: "auto", padding: "20px"}}>
-                No Data Found
-              </tbody>
-              </>
+                  <thead>
+                    <tr>
+                      <th>TRANSACTION</th>
+                      <th>AMOUNT RECEIVED</th>
+                      <th>STATUS</th>
+                      <th>SENT ON</th>
+                      <th>CLEARED ON</th>
+                      <th>ACCOUNT</th>
+                    </tr>
+                  </thead>
+                  <tbody style={{ margin: "auto", padding: "20px" }}>
+                    No Data Found
+                  </tbody>
+                </>
               )}
             </table>
           </Box>
@@ -471,16 +504,16 @@ const AgreementPage = () => {
           gap: 2,
           borderRadius: "8px",
           mt: 0,
-          marginTop: "30px"
+          marginTop: "30px",
         }}
       >
         <CardContent sx={{ padding: 0 }}>
           <Typography variant="h6" sx={{ padding: 2 }}>
-          Policies
+            Policies
           </Typography>
           <Box sx={{ overflowX: "auto", padding: 2 }}>
-            <table className={styles.policies} >
-                <thead>
+            <table className={styles.policies}>
+              <thead>
                 <tr>
                   <th>TRANSACTION</th>
                   <th>AMOUNT RECEIVED</th>
@@ -491,7 +524,7 @@ const AgreementPage = () => {
                 </tr>
               </thead>
               <hr style={{ borderTop: "1px #ccc", marginTop: "0px" }} />
-              <tbody style={{margin: "auto", padding: "20px"}}>
+              <tbody style={{ margin: "auto", padding: "20px" }}>
                 No Data Found
               </tbody>
               <hr style={{ borderTop: "1px #ccc", marginTop: "10px" }} />
@@ -511,15 +544,18 @@ const AgreementPage = () => {
           borderRadius: "8px",
           mt: 0,
           marginBottom: "30px",
-          marginTop: "30px"
+          marginTop: "30px",
         }}
       >
         <CardContent sx={{ padding: 0 }}>
           <Typography variant="h6" sx={{ padding: 2 }}>
-          Communication
+            Communication
           </Typography>
-          <Typography variant="h6" sx={{ padding: 2, alignContent: "center", textAlign: "center" }}>
-          No communication has been sent yet
+          <Typography
+            variant="h6"
+            sx={{ padding: 2, alignContent: "center", textAlign: "center" }}
+          >
+            No communication has been sent yet
           </Typography>
         </CardContent>
       </Card>
