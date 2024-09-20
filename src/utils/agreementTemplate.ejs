@@ -1,0 +1,1722 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>unearned-fees</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Zeyada&display=swap" rel="stylesheet">
+
+
+</head>
+
+<body style="margin: auto; padding:0;">
+
+  <%
+  function withTime(inputDateString) {
+    // Create a Date object from the input string
+    const date = new Date(inputDateString);
+  
+    // Array of month abbreviations
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[date.getUTCMonth()]; // Get month name
+  
+    // Get the day and year
+    const day = date.getUTCDate();
+    const year = date.getUTCFullYear();
+  
+    // Get the UTC time components
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+  
+    // Function to get the appropriate suffix for the day
+    function getDaySuffix(day) {
+      if (day > 3 && day < 21) return 'th'; // Handle teens
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    }
+  
+    const dayWithSuffix = `${day}${getDaySuffix(day)}`;
+  
+    // Format the time with leading zeros
+    const formattedTime = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes} UTC`;
+  
+    // Return the formatted date and time
+    return `${month} ${dayWithSuffix}, ${year} at ${formattedTime}`;
+  }
+  
+function withoutTime(inputDateString) {
+    // Create a Date object from the input string
+    const date = new Date(inputDateString);
+  
+    // Array of month abbreviations
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[date.getMonth()]; // Get month name
+  
+    // Get the day and year
+    const day = date.getDate();
+    const year = date.getFullYear();
+  
+    // Function to get the appropriate suffix for the day
+    function getDaySuffix(day) {
+      if (day > 3 && day < 21) return 'th'; // Handle teens
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    }
+  
+    const dayWithSuffix = `${day}${getDaySuffix(day)}`;
+  
+    // Return the formatted date
+    return `${month} ${dayWithSuffix}, ${year}`;
+  }
+
+  %>
+
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" valign="top"
+    style="font-family: arial, sans-serif; font-size: 12px; font-weight: 400; color: #000000; width: 100%; max-width: 758px; margin: 0 auto;">
+
+    <tbody>
+      <tr>
+        <td align="top" valign="top">
+
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+            <tbody>
+              <tr>
+                <td align="center" valign="top">
+                  <div style="width:25px">&nbsp;</div>
+                </td>
+                <td align="center" valign="top">
+                  <div style="height: 35px;">&nbsp;</div>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                                    <tbody>
+                                      <tr>
+                                        <td width="160" valign="center">
+                                          <div style="width:160px"></div>
+                                        </td>
+                                        <td valign="center" align="center">
+                                          <h1
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 16px; font-weight: bold;  text-transform: uppercase; color: #000000;">
+                                            PREMIUM FINANCE AGREEMENT</h1>
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                                            Assigned To:</div>
+
+                                          <h2
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 20px; font-weight: bold;line-height: normal;  color: #000000;">
+                                            Link Finance, LLC
+                                          </h2>
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 500;  color: #000000;">
+                                            <!-- P.O. Box 829522 • Pembroke Pines, -->
+                                            <!-- FL 33082 -->
+                                          </div>
+
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 500;  color: #000000;">
+                                            100 Hallet St., Boston, MA 02124</div>
+                                        </td>
+                                        <td width="160" valign="center">
+                                          <div
+                                            style="width:160px; font-family: arial, sans-serif; font-size: 10px; font-weight: 400; color: #000000;">
+                                            Date:
+                                            <span
+                                              style="font-family: arial, sans-serif; font-size: 12px; font-weight: 400; color: #333333;margin-left: 15px;">
+                                              <%= withoutTime(agreements.quotes[0].effectiveDate.replace(/\s+/g, '')) %>
+                                            </span>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height:10px">&nbsp;</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                    <tbody>
+                                      <tr>
+                                        <td valign="top" style="padding: 2px 5px; border: 1px solid black; width:220px">
+                                          <div
+                                            style="font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #000000; text-transform: uppercase;">
+                                            INSUREDS NAME &amp; ADDRESS</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333">
+                                            <% if (customer.customerType === "Commercial customer") { %>
+                                                <%= customer.customerBusiness?.businessName %>
+                                              <% } else if (customer.customerType === "Personal customer") { %>
+                                                <%= customer.firstName %> <%= customer.lastName %>
+                                              <% } %>
+                                           
+                                          </div>
+                                        </td>
+                                        <td valign="top" style="padding: 2px 5px; border: 1px solid black;">
+                                          <div
+                                            style="font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #000000;">
+                                            E-mail Address</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 11px; font-weight: 400;  color: #333333">
+                                            <%= customer.isContact ? customer.contact.email : customer.email %>
+
+                                          </div>
+                                        </td>
+                                        <td valign="top" style="padding: 2px 5px; border: 1px solid black; width:220px">
+                                          <div
+                                            style="font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #000000; text-transform: uppercase;">
+                                            PRODUCER &amp; LENDER, NAME &amp;
+                                            ADDRESS</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style="font-family: arial, sans-serif;font-size: 14px;font-weight: 400;color: #333333">
+                                            <%= producer.firstName %>
+                                              <%= producer.lastName %>
+                                          </div>
+                                        </td>
+                                        <td valign="top" align="center"
+                                          style="padding: 2px 5px; border: 1px solid black; width:70px">
+                                          <div
+                                            style="font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #000000; text-transform: uppercase;">
+                                            Link Finance ACCT. NO.</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333;text-align: left;">
+                                            00001</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td valign="top"
+                                          style="padding: 2px 5px; border: 1px solid black; border-right: 0;">
+                                          <div
+                                            style="font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #000000; text-transform: uppercase;">
+                                            &nbsp;</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333">
+                                            <% if (customer.customerType === "Commercial customer") { %>
+                                                <%= customer.customerBusiness?.addressOne %>  <%= customer.customerBusiness?.addressTwo %>
+                                              <% } else if (customer.customerType === "Personal customer") { %>
+                                                <%= customer.address %>
+                                              <% } %>
+                                          
+                                          
+                                           
+                                          </div>
+                                        </td>
+                                        <td valign="top"
+                                          style="padding: 2px 5px; border: 1px solid black; border-left: 0;">
+                                          <div
+                                            style="font-family: arial, sans-serif;font-size: 10px;font-weight: 400;color: #000000;text-transform: uppercase;">
+                                            PHONE</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333">
+                        
+                                            <%= customer.isContact ? customer.contact.phone : customer.phoneNumber %>
+
+                                          </div>
+                                        </td>
+                                        <td valign="top" style="padding: 2px 5px; border: 1px solid black;">
+                                          <div
+                                            style="font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #000000; text-transform: uppercase;">
+                                          </div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333">
+                                            <%= producer.addressOne %>
+                                              <%= producer.addressTwo %>
+                                          </div>
+                                        </td>
+                                        <td valign="top" align="center"
+                                          style="padding: 2px 5px; border: 1px solid black;">
+                                          <div
+                                            style="font-family: arial, sans-serif;font-size: 10px;font-weight: 400;color: #000000;text-transform: uppercase;">
+                                            PRODUCER #</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333;text-align: left;">
+                                            00001</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td valign="center" colspan="2"
+                                          style="padding: 2px 5px; border: 1px solid black; border-right: 0;">
+
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333">
+                                           
+                                            <% if (customer.customerType === "Commercial customer") { %>
+                                                <%= customer.customerBusiness?.city %> ,  <%= customer.customerBusiness?.state %> <%= customer.customerBusiness?.zipCode %>
+                                              <% } else if (customer.customerType === "Personal customer") { %>
+                                                <%= customer.city %>,
+                                                <%= customer.state %>
+                                                  <%= customer.zipCode %>
+                                              <% } %>
+
+
+
+                                          </div>
+                                        </td>
+                                        <td valign="center" style="padding: 2px 5px; border: 1px solid black;">
+
+                                          <div
+                                            style=" font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333">
+                                            <%= producer.city %>
+                                              <%= producer.state %>
+                                                <%= producer.zipCode %>
+                                          </div>
+                                        </td>
+                                        <td valign="top" align="center"
+                                          style="padding: 2px 5px; border: 1px solid black;">
+                                          <div
+                                            style="font-family: arial, sans-serif;font-size: 10px;font-weight: 400;color: #000000;text-transform: uppercase;">
+                                            Link Finance USE ONLY</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style="font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #333333;text-align: left;">
+                                          </div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td colspan="4" style="padding:5px 20px">
+                                          <p
+                                            style="margin:0; padding:0; font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #000000;text-align: justify;">
+                                            <b>Assignment:</b>
+                                            For value received, lender hereby
+                                            sells and assigns this Premium
+                                            Finance Agreement, and all rights
+                                            and documents related thereto, to
+                                            Assignee Link Finance, LLC (Link)
+                                            as provided in a Purchase and Sale
+                                            Agreement between Lender and Link.
+                                            Link will service this agreement
+                                            and Insured shall make payments at
+                                            the address specified by Link. The
+                                            term Lender shall include Link
+                                            subsequent to the assignment.
+                                          </p>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height: 5px;">&nbsp;</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                    <tbody>
+                                      <tr>
+                                        <td colspan="7" align="center">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: bold;  color: #000000; text-transform: uppercase;">
+                                            SCHEDULE OF POLICIES</div>
+                                          <div style="height:5px">&nbsp;</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td align="center" valign="center" width="56"
+                                          style="border: 1px solid black;padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-transform: uppercase;">
+                                            FC USE ONLY</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black;padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-transform: uppercase;">
+                                            EFFECTIVE DATE</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-transform: uppercase;">
+                                            EXPIRATION DATE</div>
+                                        </td>
+                                        <td align="center" valign="center" width="232"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-transform: uppercase;">
+                                            NAME AND ADDRESS OF INSURING
+                                            COMPANY AND MANAGING GENERAL AGENT</div>
+                                        </td>
+                                        <td align="center" valign="center" width="100"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-transform: uppercase;">
+                                            TYPE OF COVERAGE</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-transform: uppercase;">
+                                            POLICY NO.</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-transform: uppercase;">
+                                            PREMIUM</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td align="center" valign="top"
+                                          style="border: 1px solid black; padding: 2px 5px ; height: 100px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                          </div>
+                                        </td>
+                                        <td align="center" valign="top"
+                                          style="border: 1px solid black; padding: 2px 5px ; height: 100px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                            <%= withoutTime(agreements.quotes[0].effectiveDate.replace(/\s+/g, '')) %>
+
+                                          </div>
+                                        </td>
+                                        <td align="center" valign="top"
+                                          style="border: 1px solid black; padding: 2px 5px ; height: 100px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                            <%= withoutTime(agreements.quotes[0].expirationDate.replace(/\s+/g, '')) %>
+
+                                          </div>
+                                        </td>
+                                        <td align="center" valign="top"
+                                          style="border: 1px solid black; padding: 2px 5px ; height: 100px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333">
+                                            <%= agreements.quotes[0].carrier.title %>
+                                        </div>
+                                        <div style="height:20px">&nbsp;</div>
+                                        <div
+                                        style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333">
+                                        <%= agreements.quotes[0].wholesaler.title %>
+                                          </div>
+                                        </td>
+                                        <td align="left" valign="top"
+                                          style="border: 1px solid black; padding: 2px 5px ; height: 100px;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 8px;font-weight: normal;color: #333333">
+                                            <%= agreements.quotes[0].coverage.title %>
+                                          </div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 8px;font-weight: normal;color: #333333">
+                                            EARNED FEES</div>
+                                          <div style="height:8px">&nbsp;</div>
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 8px;font-weight: normal;color: #333333">
+                                            UNEARNED FEES</div>
+                                        </td>
+                                        <td align="center" valign="top"
+                                          style="border: 1px solid black; padding: 2px 5px ; height: 100px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                            <%= agreements.quotes[0].policyNumber %>
+                                          </div>
+                                        </td>
+                                        <td align="right" valign="top"
+                                          style="border: 1px solid black; padding: 2px 5px ; height: 100px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                            $ <%= agreements.quotes[0].premium %>
+                                          </div>
+                                          <div style="height:5px">&nbsp;</div>
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                            $ <%= agreements.quotes[0].earnedFee %>
+                                          </div>
+                                          <div style="height:5px">&nbsp;</div>
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                            $ <%= agreements.quotes[0].unearnedFee %>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td colspan="2" align="center"
+                                          style="padding: 2px;border-left: 1px solid #000;">
+                                          <div>&nbsp;</div>
+                                        </td>
+                                        <td colspan="3" align="center" style="padding: 2px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: normal;  color: #000000;">
+                                            Continued on - Schedule of
+                                            Additional Policies)
+                                          </div>
+                                        </td>
+                                        <td colspan="2" align="left" style="padding: 2px;border-right: 1px solid #000;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 8px; font-weight: normal;  color: #000000;">
+                                            Agency Fee: $ <%= agreements.totalAgencyFee %>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td colspan="7" align="center"
+                                          style="border: 1px solid black; padding: 1px 5px; background: #000000;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: bold;  color: #ffffff; text-transform: uppercase;">
+                                            FEDERAL TRUTH-IN-LENDING
+                                            DISCLOSURE STATEMENT</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td colspan="7">
+                                          <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                            <tbody>
+                                              <tr>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;text-transform: uppercase;">
+                                                    CASH PRICE
+                                                    <br />
+                                                    (TOTAL PREMIUM(S))
+                                                  </div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;text-transform: uppercase;">
+                                                    (-) DOWN PAYMENT</div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;text-transform: uppercase;">
+                                                    (=) AMOUNT FINANCED</div>
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 9px;font-weight: normal;color: #000000;">
+                                                    amount of credit provide
+                                                    to you or on your behalf</div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px; border-left-width: 4px; border-right-width: 4px;">
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;text-transform: uppercase;">
+                                                    “(+) FINANCE CHARGE”</div>
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 9px;font-weight: normal;color: #000000;">
+                                                    the dollar amount the
+                                                    credit will cost you</div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;text-transform: uppercase;">
+                                                    “(=) TOTAL OF PAYMENTS”</div>
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 9px;font-weight: normal;color: #000000;">
+                                                    amount you will have paid
+                                                    after you have made the
+                                                    scheduled payments</div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px; border-left-width: 4px; border-right-width: 4px;">
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;text-transform: uppercase;">
+                                                    “ANNUAL PERCENTAGE RATE”</div>
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 9px;font-weight: normal;color: #000000;">
+                                                    the cost of your credit as
+                                                    a yearly rate
+                                                  </div>
+                                                </td>
+                                              </tr>
+                                              <tr>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                                    $<%= agreements.totalCashPrice %>
+                                                  </div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                                    $<%= agreements.totalDownPayment %>
+                                                  </div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                                    $<%= agreements.totalAmountFinanced %>
+                                                  </div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px; border-left-width: 4px; border-right-width: 4px; border-bottom-width: 4px">
+                                                  <div
+                                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                                    $<%= agreements.totalFinanceCharge %>
+                                                  </div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                                    $<%= agreements.totalOfPayment %>
+                                                  </div>
+                                                </td>
+                                                <td align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px; border-left-width: 4px; border-right-width: 4px; border-bottom-width: 4px">
+                                                  <div
+                                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                                    <%= agreements.totalAgreementAPR %>
+                                                  </div>
+                                                </td>
+                                              </tr>
+                                              <tr>
+                                                <td width="124" align="center" valign="center"
+                                                  style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;text-transform: uppercase;">
+                                                    TOTAL SALES PRICE</div>
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 9px;font-weight: normal;color: #000000;">
+                                                    the total cost of your
+                                                    credit including your down
+                                                    payment
+                                                    <br />(cash price +
+                                                    finance charge)
+                                                  </div>
+                                                </td>
+                                                <td align="left" valign="top"
+                                                  style="border: 1px solid black; padding: 5px;" colspan="3"
+                                                  rowspan="2">
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-align: justify;">
+                                                    <b>Security:</b>
+                                                    You are giving a security
+                                                    interest in any and all
+                                                    unearned return premiums
+                                                    and dividends which may
+                                                    become payable under the
+                                                    policies listed above.
+                                                  </div>
+                                                  <div style="height:8px">&nbsp;</div>
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-align: justify;">
+                                                    <b>Late Charge:</b>
+                                                    If a payment is more than
+                                                    10 days late, you will be
+                                                    charged 5% of the payment
+                                                    amount, with a maximum of
+                                                    $5.00 if the account is
+                                                    for personal, family or
+                                                    household purposes.
+                                                  </div>
+                                                  <div style="height:8px">&nbsp;</div>
+                                                  <div
+                                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-align: justify;">
+                                                    <b>Prepayment:</b>
+                                                    If you pay off early, you
+                                                    will not have to pay a
+                                                    penalty, and you may be
+                                                    entitled to a refund of
+                                                    part of the finance
+                                                    charge. See the provisions
+                                                    on page 2 for additional
+                                                    information about
+                                                    nonpayment, default and
+                                                    required repayment in full
+                                                    before the scheduled date,
+                                                    and prepayment, refunds
+                                                    and penalties.
+                                                  </div>
+                                                  <div style="height:8px">&nbsp;</div>
+                                                </td>
+                                                <td valign="top" style="border: 1px solid black;" colspan="2"
+                                                  rowspan="2">
+                                                  <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                                    valign="top"
+                                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                                    <tbody>
+                                                      <tr>
+                                                        <td width="220" colspan="3" align="center"
+                                                          style="padding: 5px;">
+                                                          <div
+                                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 12px;font-weight: bold;color: #000000;text-transform: uppercase;">
+                                                            YOUR PAYMENT
+                                                            SCHEDULE WILL BE:</div>
+                                                        </td>
+                                                      </tr>
+                                                      <tr>
+                                                        <td
+                                                          style="padding: 3px 5px; border:1px solid black; border-left:0"
+                                                          align="center">
+                                                          <div
+                                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;">
+                                                            Amount of each
+                                                            Payment</div>
+                                                        </td>
+                                                        <td style="padding: 3px 5px; border:1px solid black;"
+                                                          align="center">
+                                                          <div
+                                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;">
+                                                            Number of Payments</div>
+                                                        </td>
+                                                        <td
+                                                          style="padding: 3px 5px; border:1px solid black;border-right: 0;"
+                                                          align="center">
+                                                          <div
+                                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;">
+                                                            When first Payment
+                                                            is Due
+                                                          </div>
+                                                        </td>
+                                                      </tr>
+                                                      <tr>
+                                                        <td
+                                                          style="padding: 3px 5px; border:1px solid black; border-left:0"
+                                                          align="center">
+                                                          <div
+                                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 12px;font-weight: normal;color: #333333;line-height: 1.5;">
+                                                            $<%= agreements.totalMonthlyPayment %>
+                                                          </div>
+                                                        </td>
+                                                        <td style="padding: 3px 5px; border:1px solid black;"
+                                                          align="center">
+                                                          <div
+                                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 12px;font-weight: normal;color: #333333;line-height: 1.5;">
+                                                            10</div>
+                                                        </td>
+                                                        <td
+                                                          style="padding: 3px 5px; border:1px solid black;border-right: 0;"
+                                                          align="center">
+                                                          <div
+                                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 12px;font-weight: normal;color: #333333;line-height: 1.5;">
+                                                                                                          <%= withoutTime(agreements.quotes[0].effectiveDate.replace(/\s+/g, '')) %>
+
+                                                          </div>
+                                                        </td>
+                                                      </tr>
+                                                      <tr>
+                                                        <td colspan="3" style="padding: 3px 5px;">
+                                                          <div
+                                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: normal;  color: #000000;">
+                                                            Each of the
+                                                            monthly payments
+                                                            is due on the same
+                                                            day of each
+                                                            succeeding month
+                                                            until paid in
+                                                            full.</div>
+                                                        </td>
+                                                      </tr>
+                                                    </tbody>
+                                                  </table>
+                                                </td>
+                                              </tr>
+                                              <tr>
+                                                <td style="border: 1px solid black; padding: 5px;">
+                                                  <div
+                                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333;text-align: center;">
+                                                    $<%= agreements.totalSalesPrice %>
+                                                  </div>
+                                                </td>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height:6px">&nbsp;</div>
+                                  <div
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: bold;  color: #000000; text-decoration: underline; text-align: center;">
+                                    FOR PREMIUM FINANCE CONDITIONS SEE REVERSE
+                                    SIDE</div>
+                                  <div style="height:4px">&nbsp;</div>
+                                  <div
+                                    style="margin: 0; padding: 5px; font-family: arial, sans-serif; font-size: 10px; font-weight: normal;  color: #000000; border: 1px solid #000000; text-align: justify;">
+                                    The Federal Equal Credit Opportunity Act
+                                    prohibits creditors from discriminating
+                                    against credit applicants on the basis of
+                                    race, color, religion, national origin,
+                                    sex, marital status, or age; because all
+                                    or part of the applicant’s income derives
+                                    from any public assistance program. The
+                                    Federal agency which administers
+                                    compliance with this law concerning this
+                                    Premium Finance Company is the Federal
+                                    Trade Commission, 730 Peachtree Street,
+                                    N.E., Room 800, Atlanta, Georgia 30308.
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height: 5px;">&nbsp;</div>
+                                  <div
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: bold;  color: #000000; text-transform: uppercase;">
+                                    FINANCE CHARGE INCLUDES AN ADMINISTRATIVE
+                                    FEE OF   $<%= agreements.service_fee %> </div>
+                                  <div style="height:4px">&nbsp;</div>
+                                  <div
+                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: bold;color: #000000;text-transform: uppercase;text-align: justify;">
+                                    NOTICE TO INSURED: 1. DO NOT SIGN THIS
+                                    AGREEMENT BEFORE YOU READ IT OR IF IT
+                                    CONTAINS ANY BLANK SPACES. 2. YOU ARE
+                                    ENTITLED TO A COMPLETELY FILLED IN COPY OF
+                                    THIS AGREEMENT. 3. UNDER THE LAW, YOU HAVE
+                                    THE RIGHT TO PAY OFF IN ADVANCE THE FULL
+                                    AMOUNT DUE AND UNDER CERTAIN CONDITIONS TO
+                                    OBTAIN A PARTIAL REFUND OF THE FINANCE
+                                    CHARGE. INSURED ACKNOWLEDGES THAT HE HAS
+                                    RECEIVED A COMPLETED COPY OF THIS
+                                    AGREEMENT AND AGREES TO THE TERMS AND
+                                    CONDITIONS ON BOTH PAGES 1 AND 2 OF THIS
+                                    AGREEMENT.</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height:10px">&nbsp;</div>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                                    <tbody>
+                                      <tr>
+                                        <td style="width:220px">
+                                          <span
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: bold;  color: #000000; text-transform: uppercase;">MUST
+                                            BE SIGNED </span>
+                                          <span
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: bold;  color: #000000;">Signature
+                                            of insured</span>
+                                        </td>
+                                        <td valign="bottom">
+                                          <div style="font-family: 'Zeyada', cursive; border-bottom: 1px dashed #000; margin: 0; padding: 0; font-size: 18px; font-weight: normal; color: #333333;font-style: italic;">
+                                            <span>&nbsp;</span>
+                                            <% if (agreements.payment_status === "Active") { %>
+                                                <% if (customer.customerType === "Commercial customer") { %>
+                                                  <%= customer.customerBusiness.businessName %>
+                                                <% } else if (customer.customerType === "Personal customer") { %>
+                                                  <%= customer.firstName %> <%= customer.lastName %>
+                                                <% } %>
+                                              <% } %>
+                                          </div>
+                                        </td>
+                                        
+                                        <td valign="bottom" style="width:10px">
+                                          <div>&nbsp;</div>
+                                        </td>
+                                        <td style="width:30px">
+                                          <span
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: bold;  color: #000000;">Date</span>
+                                        </td>
+                                        <td valign="bottom" style="width:210px">
+                                          <div
+                                            style="border-bottom: 1px dashed #000;margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 14px;font-weight: normal;color: #333333">
+                                           <% if(agreements.acceptAgreementTime!=undefined){%> <%= withTime(agreements.acceptAgreementTime.replace(/\s+/g, '')) %> <%}else{}%>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <div style="height:10px">&nbsp;</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div
+                                    style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 10px;font-weight: normal;color: #000000;text-align: justify;">
+                                    <b>PRODUCER CERTIFICATION: Lender
+                                      Assignment to Link.</b>
+                                    The undersigned hereby certifies that the
+                                    down payment as shown on the contract has
+                                    been paid by or on behalf of the insured,
+                                    that all policies listed are or will be in
+                                    force on the stated effective dates, and
+                                    further, that the above agreement is a
+                                    bonafide and binding contract, the insured
+                                    is of legal age and has capacity to
+                                    contract, the signatures are genuine, a
+                                    copy of this agreement has been delivered
+                                    to the insured and that the undersigned is
+                                    responsible to the Lender for unearned
+                                    commissions in the event of cancellation
+                                    provided the undersigned is not obligated
+                                    to pay the same to the scheduled insurance
+                                    company. Any return premiums, endorsements
+                                    or other credits received by the Producer
+                                    on behalf of the Lender shall be remitted
+                                    upon reciept.
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height:10px">&nbsp;</div>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                                    <tbody>
+                                      <tr>
+                                        <td style="width:230px">
+                                          <span
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: bold;  color: #000000; text-transform: uppercase;">MUST
+                                            BE SIGNED </span>
+                                          <span
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: bold;  color: #000000;">Signature
+                                            of Producer</span>
+                                        </td>
+                                        <td valign="bottom">
+                                          <div
+                                            style="font-family: 'Zeyada', cursive; border-bottom: 1px dashed #000; margin: 0; padding: 0; font-size: 18px; font-weight: normal; color: #333333;font-style: italic;">
+                                            <span>&nbsp;</span>
+                                            <%= producer.firstName %>
+                                              <%= producer.lastName %>
+                                          </div>
+                                        </td>
+                                        <td valign="bottom" style="width:10px">
+                                          <div>&nbsp;</div>
+                                        </td>
+                                        <td style="width:30px">
+                                          <span
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: bold;  color: #000000;">Date</span>
+                                        </td>
+                                        <td valign="bottom" style="width:250px">
+                                          <div
+                                            style="border-bottom: 1px dashed #000;margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 14px;font-weight: normal;color: #333333">
+                                                                                          <%= withTime(agreements.quotes[0].effectiveDate.replace(/\s+/g, '')) %>
+
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height: 5px;"></div>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #333333">
+                                    <tbody>
+                                      <tr>
+                                        <td style="width:33.33%">Link Finance PFA (Rev.
+                                          06/16)</td>
+                                        <td style="width:33.33%" align="center">Link Finance.MA</td>
+                                        <td style="width:33.33%">&nbsp;</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style="height: 35px;">&nbsp;</div>
+                </td>
+                <td align="center" valign="top">
+                  <div style="width:25px">&nbsp;</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="height:45px">&nbsp;</div>
+        </td>
+      </tr>
+      <tr>
+        <td align="top" valign="top">
+          <% if(agreements.quotes.length>1){%>
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #000000;">
+            <tbody>
+              <tr>
+                <td align="center" valign="top">
+                  <div style="width:25px">&nbsp;</div>
+                </td>
+                <td align="center" valign="top">
+                  <div style="height: 25px;">&nbsp;</div>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                            <tbody>
+                              <tr>
+                                <td>
+                                  
+                                    <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                      style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+
+                                      <tbody>
+                                        <tr>
+                                          <td width="20" valign="center">
+                                            <div style="width:20px"></div>
+                                          </td>
+                                          <td valign="center" align="center">
+                                            <h2
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 16px; font-weight: bold;  text-transform: uppercase; color: #000000;">
+                                              <div>PREMIUM FINANCE AGREEMENT</div>
+                                              <div style="height:10px"></div>
+                                              <div
+                                                style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: bold;  text-transform: uppercase; color: #000000;">
+                                                SECURITYAGREEMENT, DISCLOSURE
+                                                STATEMENT AND LIMITED POWER
+                                                OFATTORNEY</div>
+                                              <div style="height:10px"></div>
+                                              <div
+                                                style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: bold;  text-transform: uppercase; color: #000000;">
+                                                ADDENDUM</div>
+                                            </h2>
+                                          </td>
+                                          <td width="20" valign="center">
+                                            <div style="width:20px"></div>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height:20px">&nbsp;</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                    <tbody>
+                                      <tr>
+                                        <td>
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;text-transform: uppercase;">
+                                            <b>Link Finance, LLC</b>
+                                            (HEREIN AFTER CALLED “LENDER”)<br />
+                                            100 Hallet St.,<br />
+                                            Boston, MA 02124
+                                          </div>
+                                          <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                            <tbody>
+                                              <tr>
+                                                <td width="140"
+                                                  style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;text-transform: uppercase;">
+                                                  PHONE TOLL FREE:</td>
+                                                <td
+                                                  style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                                  (508) 673-7859
+                                                </td>
+                                              </tr>
+                                              <tr>
+                                                <td width="140"
+                                                  style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;text-transform: uppercase;">
+                                                  </td>
+                                                <td
+                                                  style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                                  </td>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+                                        </td>
+                                        <td width="150" align="center">
+                                          <div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #000000;text-transform: uppercase;">
+                                              0
+                                            </div>
+                                            <div style="border-bottom:1px solid black;height: 2px;">
+                                            </div>
+                                            <div style="height: 2px;"></div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #000000;text-transform: uppercase;">
+                                              CONTRACT NO.
+                                            </div>
+                                          </div>
+                                          <div style="height: 2px;"></div>
+                                          <div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #000000;text-transform: uppercase;">
+                                              14562
+                                            </div>
+                                            <div style="border-bottom:1px solid black;height: 2px;">
+                                            </div>
+                                            <div style="height: 2px;"></div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #000000;text-transform: uppercase;">
+                                              AGENT NO.
+                                            </div>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height: 10px;"></div>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+                                    <tbody>
+                                      <tr>
+                                        <td align="left" valign="center"
+                                          style="border: 2px solid #000000;padding: 2px 5px;width: 50%;">
+                                          <div
+                                            style="margin: 0;padding: 0;font-family: arial, sans-serif;font-size: 12px;font-weight: 400;color: #000000;">
+                                            PRODUCER (insurance Agency/Broker)
+                                            NAME, ADDRESS and PHONE NUMBER
+                                          </div>
+                                        </td>
+                                        <td align="left" valign="center"
+                                          style="border: 2px solid #000000;padding: 2px 5px;width: 50%;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                                            BORROWER (Insured) NAME, ADDRESS
+                                            and PHONE NUMBER
+                                          </div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td align="left" valign="center"
+                                          style="border: 2px solid #000000; padding: 3px 8px 20px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333">
+                                            <%= agencyName %><br />
+                                            14 Center Street Unit 1,<br />
+                                            North Easton MA 02356<br />
+                                            5089691980
+                                          </div>
+                                        </td>
+                                        <td align="left" valign="center"
+                                          style="border: 2px solid #000000; padding: 3px 8px 20px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #333333">
+                                            <% if (customer.customerType === "Commercial customer") { %>
+                                                <%= customer.customerBusiness?.businessName %>
+                                              <% } else if (customer.customerType === "Personal customer") { %>
+                                                <%= customer.firstName %> <%= customer.lastName %>
+                                              <% } %>
+                                            <br>
+                                            <% if (customer.customerType === "Commercial customer") { %>
+                                                <%= customer.customerBusiness?.addressOne %>  <%= customer.customerBusiness?.addressTwo %>
+                                              <% } else if (customer.customerType === "Personal customer") { %>
+                                                <%= customer.address %>
+                                              <% } %>
+                                              <% if (customer.customerType === "Commercial customer") { %>
+                                                <%= customer.customerBusiness?.city %> ,  <%= customer.customerBusiness?.state %> <%= customer.customerBusiness?.zipCode %>
+                                              <% } else if (customer.customerType === "Personal customer") { %>
+                                                <%= customer.city %>,
+                                                <%= customer.state %>
+                                                  <%= customer.zipCode %>
+                                              <% } %><br>
+                                              <%= customer.isContact ? customer.contact.phone : customer.phoneNumber %>
+
+
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div style="height:30px">&nbsp;</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #000000; border-collapse: collapse;">
+
+                                    <tbody>
+                                      <tr>
+                                        <td colspan="7" align="center">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: bold;  color: #000000; text-transform: uppercase;">
+                                            SCHEDULE OF FINANCED POLICIES</div>
+                                          <div style="height:5px">&nbsp;</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #000000; text-transform: uppercase; width: 50px;">
+                                            FC USE ONLY</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #000000; text-transform: uppercase;">
+                                            EFFECTIVE DATE</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #000000; text-transform: uppercase;">
+                                            EXPIRATION DATE</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #000000; text-transform: uppercase; width: 250px;">
+                                            NAME AND ADDRESS OF INSURING
+                                            COMPANY AND MANAGING GENERAL AGENT</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;" width="100">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #000000; text-transform: uppercase; width: 100px;">
+                                            TYPE OF COVERAGE</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #000000; text-transform: uppercase; width: 80px;">
+                                            POLICY NO.</div>
+                                        </td>
+                                        <td align="center" valign="center"
+                                          style="border: 1px solid black; padding: 2px 5px;">
+                                          <div
+                                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #000000; text-transform: uppercase;">
+                                            PREMIUM</div>
+                                        </td>
+                                      </tr>
+
+                                      <% for(var i=1; i<agreements.quotes.length; i++) {%>
+                                        <tr>
+                                          <td align="center" valign="top"
+                                            style="border: 1px solid black; padding: 5px ; height: 450px;">
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                            </div>
+                                          </td>
+                                          <td align="center" valign="top"
+                                            style="border: 1px solid black; padding: 5px ; height: 450px;">
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                              <%= withoutTime(agreements.quotes[i].effectiveDate.replace(/\s+/g, '')) %>
+
+                                            </div>
+                                          </td>
+                                          <td align="center" valign="top"
+                                            style="border: 1px solid black; padding: 5px ; height: 450px;">
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                              <%= withoutTime(agreements.quotes[i].expirationDate.replace(/\s+/g, '')) %>
+
+                                            </div>
+                                          </td>
+                                          <td align="center" valign="top"
+                                            style="border: 1px solid black; padding: 5px ; height: 450px;">
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333">
+                                              <%= agreements.quotes[i].wholesaler.title %>
+                                            </div>
+                                            <div style="height:20px">&nbsp;</div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333">
+                                              <%= agreements.quotes[i].carrier.title %>
+                                            </div>
+                                          </td>
+                                          <td align="left" valign="top"
+                                            style="border: 1px solid black; padding: 5px ; height: 450px;">
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: normal;  color: #333333">
+                                              <%= agreements.quotes[i].coverage.title %>
+                                            </div>
+                                            <div style="height:30px">&nbsp;</div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: normal;  color: #333333">
+                                              EARNED FEES</div>
+                                            <div style="height:30px">&nbsp;</div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: normal;  color: #333333">
+                                              UNEARNED FEES</div>
+                                          </td>
+                                          <td align="center" valign="top"
+                                            style="border: 1px solid black; padding: 5px ; height: 450px;">
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                              <%= agreements.quotes[i].policyNumber %>
+                                            </div>
+                                          </td>
+                                          <td align="right" valign="top"
+                                            style="border: 1px solid black; padding: 5px ; height: 450px;">
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                              $<%= agreements.quotes[i].premium %>
+                                            </div>
+                                            <div style="height:30px">&nbsp;</div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                              $<%= agreements.quotes[i].earnedFee %>
+                                            </div>
+                                            <div style="height:30px">&nbsp;</div>
+                                            <div
+                                              style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 11px; font-weight: normal;  color: #333333; text-transform: uppercase;">
+                                              $<%= agreements.quotes[i].unearnedFee %>
+                                            </div>
+                                          </td>
+                                        </tr>
+
+                                        <%}%>
+
+
+                                          <tr>
+                                            <td colspan="7" align="center" style="padding: 8px;">
+                                              <div style="height:15px">&nbsp;</div>
+                                              <div
+                                                style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: normal;  color: #000000;">
+                                                Link Finance, LLC</div>
+                                            </td>
+                                          </tr>
+                                    </tbody>
+                                  </table>
+                                  <%}%>
+                                </td>
+                              </tr>
+
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style="height: 25px;">&nbsp;</div>
+                </td>
+                <td align="center" valign="top">
+                  <div style="width:25px">&nbsp;</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="height:35px">&nbsp;</div>
+        </td>
+      </tr>
+      <tr>
+        <td align="top" valign="top">
+
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 14px; font-weight: 400;  color: #000000;">
+            <tbody>
+              <tr>
+                <td align="center" valign="top">
+                  <div style="width:25px">&nbsp;</div>
+                </td>
+                <td align="center" valign="top">
+                  <div style="height: 15px;">&nbsp;</div>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: 400;  color: #000000;">
+                    <tbody>
+                      <tr>
+                        <td colspan="2">
+                          <h2
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 16px; font-weight: bold;  text-transform: uppercase; color: #000000;text-decoration: underline; text-align:center;">
+                            ADDITIONAL PROVISIONS OF PREMIUM FINANCE AGREEMENT</h2>
+                          <div style="height: 15px;">&nbsp;</div>
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: bold;  color: #000000;">
+                            <b style="font-size: 12px; font-weight: bold;"></b>
+                            WITNESSETH: That in consideration of the payment
+                            by Lender to the respective insurance companies,
+                            or their agents, of the balance of the premiums
+                            upon the policies of insurance herein before
+                            described, on the reverse side hereof, the insured
+                            promises to pay to Lender the amount shown in the
+                            completed schedule on the reverse side hereof
+                            under the caption “Total of Payments” with service
+                            charge thereon as in said schedule provided, and
+                            agrees with Lender as follows:
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan=" 2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          1.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            The insured hereby assigns to Lender as security
+                            for the total amount payable hereunder, all of
+                            their rights, title, and interest in any and all
+                            unearned return premiums and dividends which may
+                            become payable under the policies listed in the
+                            schedule on Page 1 and loss payments under said
+                            policies which reduce the unearned premiums.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          2.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            The insured agrees that all installment payments
+                            due hereunder shall be made by the insured
+                            directly to Lender and payments by the insured to
+                            any other person, firm, insurance agency,
+                            corporation, or otherwise shall not constitute
+                            payment to Lender. In the event that default be
+                            made in payment to Lender of any installment
+                            hereof and continues for twenty (20) days after
+                            the due date, time being the essence hereof, the
+                            full amount then owing hereunder shall become due
+                            and payable. No waiver by Lender of any default
+                            shall be construed as a waiver for any other or
+                            subsequent default nor impair or affect any rights
+                            or remedies incident thereto. The insured agrees
+                            that default in payment of any installment hereof
+                            for a period of ten (10) days after Notice of
+                            Intent to Cancel has been mailed to the insured by
+                            Lender, shall be deemed a request for cancellation
+                            of the scheduled policies by the insured and for
+                            notice of such cancellation to be given by Lender
+                            to said insurance companies issuing said policies.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          3.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            The insured hereby appoints Lender, its officers
+                            and agents, as their attorney in fact with full
+                            power to cancel and give notice of cancellation of
+                            said policies for non-payment of premiums. Said
+                            insurance companies or their authorized agent are
+                            hereby authorized and directed, upon the demand or
+                            request of Lender, to cancel said insurance
+                            policies and pay to the order of Lender the gross
+                            unearned or return premiums thereon pursuant to
+                            the assignment contained in paragraph 1 above,
+                            without proof of default hereunder or breach
+                            thereof, up to the amount owing hereunder. In the
+                            event that the unearned premiums are not
+                            sufficient to pay the total amount due hereunder,
+                            the insured shall pay the deficiency with interest
+                            at the highest allowable rate. Insured
+                            acknowledges that the premium upon which this loan
+                            has been determined is based upon information
+                            provided by insured to the Producer and insurance
+                            company. Therefore, this loan is based upon an
+                            estimated premium and any change or modification
+                            required by the insurance company for any reason
+                            whatsoever subsequent to the date of this
+                            agreement will not relieve the insured of any
+                            obligations hereunder.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          4.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            The insured agrees that upon default in payment of
+                            any installment more than ten (10) days, the
+                            insured shall pay on each installment in default,
+                            a default charge of 5% of the scheduled payment
+                            with a maximum of $5.00 if the account is for
+                            personal, family or household purpose. If such
+                            default results in the cancellation of any of the
+                            scheduled insurance policy (ies), a cancellation
+                            charge will be due which shall not exceed the
+                            greater of 2% of the unpaid balance due on the
+                            agreement or $5.00; however, the amount, if any,
+                            by which the charge exceeds $5.00 may only be
+                            collected if the cancellation becomes effective.
+                            If the account is for personal, family or
+                            households purposes, the cancellation charge may
+                            not exceed $5.00. Any cancellation charge may be
+                            deducted from unearned premiums received from the
+                            insurer. A charge of ten dollars ($10.00) will be
+                            made for checks, drafts or payments returned as
+                            unpaid.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          5.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            The insured recognizes and agrees that Lender is
+                            not an insurer and that Lender assumes no
+                            liability hereunder as an insurer. The insured
+                            agrees that when the cancellation by Lender is in
+                            accordance with the laws of the State of
+                            Massachusetts, Lender is not responsible for
+                            consequential damages, and the insured shall be
+                            responsible for costs and attorneys fees in any
+                            unsuccessful action filed as a result thereof. The
+                            Insured understands and agrees that the Producer
+                            who solicited these policies is not an agent of
+                            Lender. The insured hereby releases and discharges
+                            and agrees to hold harmless Lender and each holder
+                            hereof, their officers, agent and employees from
+                            any liability or cause of action by reason of any
+                            cancellation, when such cancellation is in
+                            conformance with the provisions of the
+                            Massachusetts Statutes. Lender shall have the
+                            right to accept any payment or payments from the
+                            Insured after notice of cancellation has been sent
+                            to the insurance company (ies) and apply them as a
+                            reduction of the indebtedness hereunder and
+                            neither the acceptance nor the application of any
+                            such payment or payments shall constitute an
+                            undertaking on the part of Lender to reinstate
+                            such insurance or constitute a waiver of any
+                            default hereunder. In the event that Lender
+                            requests reinstatement of such insurance, Lender
+                            assumes no responsibility that such request will
+                            be received or honored by the insurance company,
+                            and the Insured must verify the existence of
+                            coverage directly with the insurance company or
+                            its agent. Any notice or service required by law
+                            shall be completed when Lender deposits it with
+                            the U.S. Post Office. This contract will be
+                            construed by the laws of the State of
+                            Massachusetts.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          6.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            The insured hereby further authorizes the Lender
+                            to endorse his/her name on any check or draft for
+                            all monies that may become due from the insuring
+                            company and to apply the same as payment of this
+                            agreement, and return any excess, providing such
+                            excess is an amount greater than or equal to one
+                            Dollar ($1.00). If the balance of the amount due
+                            under this contract is paid off prior to maturity,
+                            then the insured may receive a refund of the
+                            finance charge, after first deducting $16.00,
+                            based on the actuarial method.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          7.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            Upon request of the insured, Lender has the option
+                            of advancing to the insured’s agent or the
+                            insuring company any additional premiums that may
+                            become due less the down payment required by
+                            Lender, adding the advanced amount plus any
+                            finance charge, to the insured’s present contract
+                            balance.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          8.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            If policy is not issued at the time this agreement
+                            is executed then the insured gives Lender the
+                            authority to fill in the name of the insuring
+                            company, policy number and due date of the first
+                            payment, and correct any patent errors.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          9.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            This contract may be assigned and the holder or
+                            assignee has the same rights as Lender.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top"
+                          style="width:20px;margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000;">
+                          10.</td>
+                        <td valign="top">
+                          <p
+                            style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 12px; font-weight: normal;  color: #000000; text-align:justify;">
+                            This contract is subject to approval and
+                            acceptance by Lender and if not approved and
+                            accepted, any payments received will be returned.
+                            Issuing checks for the policies listed on the
+                            reverse hereof to the Producer or Insurer or
+                            paying a draft will be considered acceptance.
+                            Should Lender draft sent to the respective
+                            insurance company not be received or deposited by
+                            the insurance company, Lender assumes no liability
+                            hereunder as an insurer and will refund any
+                            payments made by the Insured.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div style="height:10px">&nbsp;</div>
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <div style="height: 5px;"></div>
+                                  <table width="100%" cellpadding="0" cellspacing="0" border="0" valign="top"
+                                    style="margin: 0; padding: 0; font-family: arial, sans-serif; font-size: 10px; font-weight: 400;  color: #333333">
+                                    <tbody>
+                                      <tr>
+                                        <td style="width:33.33%">Link Rev.
+                                          (02/24)</td>
+                                        <td style="width:33.33%" align="center">&nbsp;</td>
+                                        <td style="width:33.33%">&nbsp;</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style="height: 15px;">&nbsp;</div>
+                </td>
+                <td align="center" valign="top">
+                  <div style="width:25px">&nbsp;</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+
+  </table>
+  <!-- ============================================================================ -->
+
+</body>
+
+</html>

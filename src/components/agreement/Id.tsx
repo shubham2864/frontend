@@ -21,7 +21,7 @@ import styles from "../../styles/Agreement.module.css";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { AgreementDetails } from "@/types/types";
-import { fetchAgreementData, sendTemplateEmail } from "@/services/api";
+import { fetchAgreementData, getPDF, sendTemplateEmail } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
 import { generatePDF } from "@/utils/pdfUtils";
 
@@ -46,17 +46,40 @@ const AgreementPage = () => {
   const handleGenerateAgreementPDF = async () => {
     setLoading(true);
     try {
-      const userId = '66db181ec843ede380c890e7'; // Example userId
+      const userId = "66deb4015bc46e907ac00b47"; // Example userId
       const userData = await fetchAgreementData(userId); // Fetch data from backend
 
-      // Generate the PDF
-      await generatePDF(userData);
+      const response = await getPDF(userData);
+      console.log(response);
+
+      if (response.status === 200) {
+        const blob = response.data; // Fetch the response as a blob
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `agreement-${userId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } else if (response.status === 201) {
+        console.warn("PDF generation initiated, but response status is 201. Check the backend logic.");
+      } else {
+        console.error("Failed to generate PDF. Response status:", response.status);
+      }
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
     } finally {
       setLoading(false);
     }
   };
+  //     // Generate the PDF
+  //     await generatePDF(userData);
+  //   } catch (error) {
+  //     console.error('Error generating PDF:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     if (id) {

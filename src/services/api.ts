@@ -410,3 +410,9 @@ export const fetchAgreementData = async (userId: string) => {
     throw error;
   }
 };
+
+export const getPDF = async (userData: any) => {
+  console.log("helloGetPDF");
+  const response = await api.post("/pdf", userData, { responseType: 'blob' }); // Set responseType to 'blob'
+  return response; // This response will now contain the Blob data
+};
