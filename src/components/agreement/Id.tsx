@@ -34,6 +34,7 @@ const AgreementPage = () => {
   const [transactionTab, setTransactionTab] = useState(0);
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const linkText = "https://sandbox.app.link-finance.com";
 
   const handleTabChange = (event: any, newValue: any) => {
     setTabIndex(newValue);
@@ -43,13 +44,25 @@ const AgreementPage = () => {
     setTransactionTab(newValue);
   };
 
-  const handleGenerateAgreementPDF = async () => {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(linkText)
+      .then(() => {
+        console.log("Link copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy the link:", err);
+      });
+  };
+
+  const handleGeneratePDF = async (documentType: any) => {
+    // documentType is either 'agreement' or 'loanPolicy'
     setLoading(true);
     try {
       const userId = "66deb4015bc46e907ac00b47"; // Example userId
       const userData = await fetchAgreementData(userId); // Fetch data from backend
 
-      const response = await getPDF(userData);
+      // Include the document type (agreement/loanPolicy) in the request
+      const response = await getPDF({ ...userData, documentType });
       console.log(response);
 
       if (response.status === 200) {
@@ -57,14 +70,19 @@ const AgreementPage = () => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", `agreement-${userId}.pdf`);
+        link.setAttribute("download", `${documentType}-${userId}.pdf`);
         document.body.appendChild(link);
         link.click();
         link.remove();
       } else if (response.status === 201) {
-        console.warn("PDF generation initiated, but response status is 201. Check the backend logic.");
+        console.warn(
+          "PDF generation initiated, but response status is 201. Check the backend logic."
+        );
       } else {
-        console.error("Failed to generate PDF. Response status:", response.status);
+        console.error(
+          "Failed to generate PDF. Response status:",
+          response.status
+        );
       }
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -196,25 +214,25 @@ const AgreementPage = () => {
           </Box>
 
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            <Tooltip title="Copy Link">
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  bgcolor: "#ccfbf1",
-                  padding: "4px 8px",
-                  borderRadius: 1,
-                  cursor: "pointer",
-                }}
-              >
-                <Typography variant="body2" color="primary">
-                  https://sandbox.app.link-finance.co
-                </Typography>
-                <IconButton size="small">
-                  <ContentCopyIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Tooltip>
+          <Tooltip title="Copy Link">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          bgcolor: "#ccfbf1",
+          padding: "4px 8px",
+          borderRadius: 1,
+          cursor: "pointer",
+        }}
+      >
+        <Typography variant="body2" color="primary">
+          {linkText}
+        </Typography>
+        <IconButton size="small" onClick={handleCopy}>
+          <ContentCopyIcon fontSize="small" />
+        </IconButton>
+      </Box>
+    </Tooltip>
             <Button
               variant="contained"
               color="success"
@@ -304,7 +322,7 @@ const AgreementPage = () => {
                   variant="body2"
                   color="primary"
                   sx={{ textDecoration: "underline", cursor: "pointer" }}
-                  onClick={handleGenerateAgreementPDF}
+                  onClick={() => handleGeneratePDF("agreement")} // Generates Agreement PDF
                 >
                   {loading
                     ? "Generating Agreement PDF..."
@@ -315,8 +333,11 @@ const AgreementPage = () => {
                   variant="body2"
                   color="primary"
                   sx={{ textDecoration: "underline", cursor: "pointer" }}
+                  onClick={() => handleGeneratePDF("loanPolicy")} // Generates Loan Policy PDF
                 >
-                  Generate Loan Agreement PDF
+                  {loading
+                    ? "Generating Loan Policy PDF..."
+                    : "Generate Loan Policy PDF"}
                 </Typography>
               </Box>
 

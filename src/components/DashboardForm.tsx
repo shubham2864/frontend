@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthContext";
 import styles from "../styles/Dashboard.module.css";
+import Link from "next/link";
 
 const DashboardForm: React.FC = () => {
   const { isAuthenticated, authChecked } = useAuth();
@@ -146,6 +147,7 @@ const DashboardForm: React.FC = () => {
           <button className={styles.pageButton}>&gt;</button>
         </div>
       </div>
+      <Link href="/profile" replace>Go to Page</Link>
     </div>
   );
 };

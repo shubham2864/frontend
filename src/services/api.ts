@@ -217,7 +217,10 @@ export const fetchCustomerDetails = async (email: string) => {
   return response.data;
 };
 
-export const updateCompanyDetails = async (orgDetails: any, companyId: string) => {
+export const updateCompanyDetails = async (
+  orgDetails: any,
+  companyId: string
+) => {
   const {
     companyName,
     mobileNumber,
@@ -229,7 +232,7 @@ export const updateCompanyDetails = async (orgDetails: any, companyId: string) =
     taxId,
     type,
     businessOwner,
-    isVerified
+    isVerified,
   } = orgDetails;
 
   try {
@@ -244,7 +247,7 @@ export const updateCompanyDetails = async (orgDetails: any, companyId: string) =
       zipCode,
       taxId,
       type,
-      isVerified
+      isVerified,
     });
 
     // Update or create business owner details
@@ -285,7 +288,10 @@ export const updateCompanyDetails = async (orgDetails: any, companyId: string) =
             companyId: companyId,
           });
         } else {
-          console.error(`Failed to update or create user ${owner.email}:`, error);
+          console.error(
+            `Failed to update or create user ${owner.email}:`,
+            error
+          );
         }
       }
     }
@@ -393,7 +399,7 @@ export const getAgreementByEmail = async (email: string) => {
 export const sendTemplateEmail = async (id: any) => {
   try {
     const response = await api.post(`/agreement/templateEmail/${id}`);
-    alert("email sent successfully!!!")
+    alert("email sent successfully!!!");
     return response.data;
   } catch (error) {
     console.error("Error fetching agreement by email", error);
@@ -406,13 +412,12 @@ export const fetchAgreementData = async (userId: string) => {
     const response = await api.get(`/agreement/id/${userId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    console.error("Error fetching user data:", error);
     throw error;
   }
 };
 
 export const getPDF = async (userData: any) => {
-  console.log("helloGetPDF");
-  const response = await api.post("/pdf", userData, { responseType: 'blob' }); // Set responseType to 'blob'
+  const response = await api.post("/pdf", userData, { responseType: "blob" }); // Set responseType to 'blob'
   return response; // This response will now contain the Blob data
 };
